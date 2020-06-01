@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="6baaf3ca-8d46-4e6c-b04e-8e09681f6ecd" name="Default Changelist" comment="basic changes">
+      <change afterPath="$PROJECT_DIR$/.idea/libraries/JenaLibs.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/APDescription.txt" beforeDir="false" afterPath="$PROJECT_DIR$/APDescription.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/JadeApplication.iml" beforeDir="false" afterPath="$PROJECT_DIR$/SmartCity.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/MTPs-Main-Container.txt" beforeDir="false" afterPath="$PROJECT_DIR$/MTPs-Main-Container.txt" afterDir="false" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FavoritesManager">
+    <favorites_list name="JadeApplication" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectId" id="1YagBP5pg6vBekdMNvnU4iQMtCQ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showExcludedFiles" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../github/GRAU-SID" />
+    <property name="project.structure.last.edited" value="Modules" />
+    <property name="project.structure.proportion" value="0.15" />
+    <property name="project.structure.side.proportion" value="0.2" />
+    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+  </component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="org.upc.edu.Behaviours" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\tranc\repos\JadeApplication\lib" />
+      <recent name="C:\Users\tranc\repos\JadeApplication\src" />
+    </key>
+  </component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Application.GUI">
+    <configuration name="CyclicBehaviourAgent" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="jade.Boot" />
+      <module name="SmartCity" />
+      <option name="PROGRAM_PARAMETERS" value="-local-host 127.0.0.1 -container CycleHello:org.upc.edu.Behaviours.CyclicBehaviourAgent()" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GUI" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="jade.Boot" />
+      <module name="SmartCity" />
+      <option name="PROGRAM_PARAMETERS" value="-local-host 127.0.0.1 -gui" />
+      <RunnerSettings RunnerId="Run" />
+      <ConfigurationWrapper RunnerId="Run" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="HelloWorldAgent" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="jade.Boot" />
+      <module name="SmartCity" />
+      <option name="PROGRAM_PARAMETERS" value="-local-host 127.0.0.1 -container HelloTio:org.upc.edu.Behaviours.HelloWorldAgent(&quot;Que&quot;,&quot;pasa&quot;,&quot;tio&quot;)" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="jenatest.Main" />
+      <module name="SmartCity" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="jenatest.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TermometroAgent" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="jade.Boot" />
+      <module name="SmartCity" />
+      <option name="PROGRAM_PARAMETERS" value="-local-host 127.0.0.1 -container Termometro:org.upc.edu.Behaviours.TermometroAgent()" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TermostatoAgent" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="jade.Boot" />
+      <module name="SmartCity" />
+      <option name="PROGRAM_PARAMETERS" value="-local-host 127.0.0.1 -container Termostato:org.upc.edu.Behaviours.TermostatoAgent()" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="TickerBehaviourAgent" type="Application" factoryName="Application">
+      <option name="MAIN_CLASS_NAME" value="jade.Boot" />
+      <module name="SmartCity" />
+      <option name="PROGRAM_PARAMETERS" value="-local-host 127.0.0.1 -container TicketAgent:org.upc.edu.Behaviours.TickerBehaviourAgent()" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Application.GUI" />
+      <item itemvalue="Application.HelloWorldAgent" />
+      <item itemvalue="Application.TermostatoAgent" />
+      <item itemvalue="Application.TermometroAgent" />
+      <item itemvalue="Application.TickerBehaviourAgent" />
+      <item itemvalue="Application.CyclicBehaviourAgent" />
+      <item itemvalue="Application.Main" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Application.Main" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SvnConfiguration">
+    <configuration />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="6baaf3ca-8d46-4e6c-b04e-8e09681f6ecd" name="Default Changelist" comment="" />
+      <created>1583185982789</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1583185982789</updated>
+      <workItem from="1583185986406" duration="412000" />
+    </task>
+    <task id="LOCAL-00001" summary="basic changes">
+      <created>1583861873989</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1583861873989</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="basic changes" />
+    <option name="LAST_COMMIT_MESSAGE" value="basic changes" />
+  </component>
+  <component name="WindowStateProjectService">
+    <state x="223" y="73" key="#com.intellij.execution.impl.EditConfigurationsDialog" />
+    <state x="223" y="73" key="#com.intellij.execution.impl.EditConfigurationsDialog/0.0.1536.834@0.0.1536.834" />
+    <state width="1493" height="166" key="GridCell.Tab.0.bottom" />
+    <state width="1493" height="166" key="GridCell.Tab.0.bottom/0.0.1536.834@0.0.1536.834" />
+    <state width="1493" height="166" key="GridCell.Tab.0.center" />
+    <state width="1493" height="166" key="GridCell.Tab.0.center/0.0.1536.834@0.0.1536.834" />
+    <state width="1493" height="166" key="GridCell.Tab.0.left" />
+    <state width="1493" height="166" key="GridCell.Tab.0.left/0.0.1536.834@0.0.1536.834" />
+    <state width="1493" height="166" key="GridCell.Tab.0.right" />
+    <state width="1493" height="166" key="GridCell.Tab.0.right/0.0.1536.834@0.0.1536.834" />
+    <state x="277" y="60" key="SettingsEditor" />
+    <state x="277" y="60" key="SettingsEditor/0.0.1536.834@0.0.1536.834" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>jar://$PROJECT_DIR$/lib/jade.jar!/jade/core/behaviours/CyclicBehaviour.class</url>
+          <line>18</line>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

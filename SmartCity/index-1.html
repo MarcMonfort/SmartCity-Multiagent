@@ -1,0 +1,51 @@
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/><title>Unknown </title></head><body>
+<h1 id="jadeapplication">JadeApplication</h1>
+<h2 id="intellij">IntelliJ</h2>
+<ol>
+<li>Open folder in IntelliJ (do not use Import).</li>
+<li>Configurations are available at the dropdown on the top right part of the IDE.</li>
+</ol>
+<h2 id="netbeans-8">NetBeans 8</h2>
+<p>To compile, just open the project (do not use Import) from the IDE.
+Classes are compiled automatically once the files are saved.</p>
+<p>To compile from command line:</p>
+<p><code>bash
+$ ant jar</code></p>
+<p>To run the GUI, from the configuration in NetBeans or from command-line:</p>
+<p>(From Linux)
+<code>bash
+$ java -cp lib/jade.jar:dist/JadeApplication.jar jade.Boot -gui
+-local-host 127.0.0.1</code></p>
+<p>(From Windows)
+<code>bash
+\&gt; java -cp lib\jade.jar;dist\JadeApplication.jar jade.Boot -gui</code></p>
+<p>To run the HelloWorldAgent, from the configuration in NetBeans (be
+careful! You can only run one configuration at a time unlike in
+IntelliJ) or from command-line:</p>
+<p>(From Linux)
+<code>bash
+$ java -cp lib/jade.jar:dist/JadeApplication.jar jade.Boot -local-host 127.0.0.1 -container HelloTio:org.upc.edu.Behaviours.HelloWorldAgent\("Que","pasa","tio"\)</code></p>
+<p>(From Windows)
+<code>bash
+\&gt; java -cp lib\jade.jar;dist\JadeApplication.jar jade.Boot -container HelloTio:org.upc.edu.Behaviours.HelloWorldAgent("Que","pasa","tio")</code></p>
+<h2 id="linux-shell">Linux shell</h2>
+<p>To compile:</p>
+<p><code>bash
+$ make</code></p>
+<p>To run the platform and GUI:</p>
+<p><code>bash
+$ make gui</code></p>
+<p>To run the HelloWorldAgent:</p>
+<p><code>bash
+$ make hello-world</code></p>
+<h2 id="windows-shell">Windows shell</h2>
+<p>To compile:</p>
+<p><code>bash
+\&gt; make.bat</code></p>
+<p>To run the platform and GUI:</p>
+<p><code>bash
+\&gt; runGui.bat</code></p>
+<p>To run the HelloWorldAgent:</p>
+<p><code>bash
+\&gt; runHelloWorld.bat</code></p>
+</body></html>
