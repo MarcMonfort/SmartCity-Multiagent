@@ -47,11 +47,11 @@ public class EntornoAgent extends Agent {
 
     }
 
-    protected void setup() {
+    /*protected void setup() {
         try {
 
         }
         HelloWorldTickerBehaviour b = new HelloWorldTickerBehaviour(this, 10000);
         this.addBehaviour(b);
-    }
+    }*/
 }
