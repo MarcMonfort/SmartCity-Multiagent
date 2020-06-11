@@ -28,13 +28,35 @@ import java.util.Random;
  */
 public class EntornoAgent extends Agent {
 
-    class Vehiculo {
+    public static class Calle {
+        public String nombre;
+        public int longitud;
+        public int ini_x;
+        public int ini_y;
+        public int fin_x;
+        public int fin_y;
+    }
+
+    public static class Vehiculo {
+        public String nombre;
         public int pos_x;
         public int pos_y;
-        public int direccion;
+        public int obj_x;
+        public int obj_y;
+        public int direccion = 0;
         public int velocidad;
+        public String calle_actual;
+        public int[] carril_inter = {20,30};
 
     };
+
+    public static int[] getCoord(String c) {
+        String[] nums = c.split(",");
+        int[] coord = new int[2];
+        coord[0] = Integer.parseInt(nums[0]);
+        coord[1] = Integer.parseInt(nums[1]);
+        return coord;
+    }
 
     //private ArrayList<Vehiculo> info_vehiculos;
 
