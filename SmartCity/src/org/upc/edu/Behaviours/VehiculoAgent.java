@@ -15,13 +15,26 @@ import java.util.Random;
 /**
  * @author igomez
  */
-public class EntornoAgent extends Agent {
+public class VehiculoAgent extends Agent {
 
-    public class EntornoTickerBehaviour extends TickerBehaviour {
+    int pos_x = 0;
+    int pos_y = 0;
+
+    int direccion = 0;
+
+    int velocidad = 0;
+    int aceleracion = 1;
+
+    int carril_fin = 50; //fin de carril
+    int[] carril_inter = {20,30};
+
+
+
+    public class VehiculoTickerBehaviour extends TickerBehaviour {
 
         ACLMessage msg;
 
-        public EntornoTickerBehaviour(Agent a, long period) {
+        public VehiculoTickerBehaviour(Agent a, long period) {
             super(a, period);
         }
 
@@ -37,8 +50,20 @@ public class EntornoAgent extends Agent {
         } */
 
         public void onTick() {
-            System.out.println("Vehiculo: Posicion, Velocidad, Dirección"); // print vector de info vehiculos
-            System.out.println("Semaforo: Color"); // print vector de info semaforo
+            // mirar si se llega al final del carril
+            switch(direccion) {
+                case 0:
+                    pos_x += velocidad; break;
+                case 1:
+                    pos_x -= velocidad; break;
+                case 2:
+                    pos_y += velocidad; break;
+                case 3:
+                    pos_y -= velocidad; break;
+            }
+            velocidad += aceleracion;
+            System.out.println("Vehiculo: Posicion=("+pos_x+", "+pos_y+"), Velocidad="+velocidad+", Dirección="+direccion);
+            //System.out.println("hola");
         }
 
     }
@@ -49,8 +74,8 @@ public class EntornoAgent extends Agent {
         desc.setName(getAID());
 
         final ServiceDescription sdesc = new ServiceDescription();
-        sdesc.setName("Entorno");
-        sdesc.setType("Entorno");
+        sdesc.setName("Vehiculo");
+        sdesc.setType("Vehiculo");
         desc.addServices(sdesc);
 
         try {
@@ -60,7 +85,7 @@ public class EntornoAgent extends Agent {
         }
         // FIN REGISTRO DF
 
-        EntornoTickerBehaviour b = new EntornoTickerBehaviour(this, 3000);
+        VehiculoTickerBehaviour b = new VehiculoTickerBehaviour(this, 3000);
         this.addBehaviour(b);
     }
 }
