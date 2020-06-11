@@ -15,8 +15,9 @@ entorno:
 	java -cp lib/jade.jar:out/production/ jade.Boot -local-host 127.0.0.1 -container elEntorno:org.upc.edu.Behaviours.EntornoAgent\("Que","pasa","tio"\) -local-host 127.0.0.1
 
 vehiculo:
-	java -cp lib/jade.jar:out/production/ jade.Boot -local-host 127.0.0.1 -container elVehiculo:org.upc.edu.Behaviours.VehiculoAgent\("Que","pasa","tio"\) -local-host 127.0.0.1
-
+	java -cp lib/jade.jar:out/production/ jade.Boot -local-host 127.0.0.1 -container elVehiculo:org.upc.edu.Behaviours.VehiculoAgent\("0"\) -local-host 127.0.0.1
+vehiculo2:
+	java -cp lib/jade.jar:out/production/ jade.Boot -local-host 127.0.0.1 -container elVehiculo_2:org.upc.edu.Behaviours.VehiculoAgent\("1"\) -local-host 127.0.0.1
 
 
 all: compile
