@@ -161,7 +161,7 @@ public class EntornoAgent extends Agent {
             System.out.println(" "); // print vector de info semaforo
 
             // AQUI SI FUNCIONA CON MULTIPLES AGENTES, ¿¿¿PORQUE???
-            MessageTemplate mt = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_QUERY);
+            /*MessageTemplate mt = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_QUERY);
             myAgent.addBehaviour(new AchieveREResponder(myAgent, mt) {
                 protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {
                     
@@ -170,13 +170,13 @@ public class EntornoAgent extends Agent {
                     int elID = Integer.parseInt(contentArray[1]);
 
                     Vehiculo aux = new Vehiculo();
-                    aux.pos_x = Integer.parseInt(contentArray[2]);
-                    aux.pos_y = Integer.parseInt(contentArray[3]);
-                    aux.velocidad = Integer.parseInt(contentArray[4]);
-                    aux.direccion = Integer.parseInt(contentArray[5]);
+                    vehiculos[elID].pos_x = Integer.parseInt(contentArray[2]);
+                    vehiculos[elID].pos_y = Integer.parseInt(contentArray[3]);
+                    vehiculos[elID].velocidad = Integer.parseInt(contentArray[4]);
+                    vehiculos[elID].direccion = Integer.parseInt(contentArray[5]);
 
                     //info_vehiculos.put(elID, aux);
-                    vehiculos[elID] = aux;
+                    //vehiculos[elID] = aux;
 
 
                     ACLMessage informDone  = request.createReply();
@@ -188,7 +188,7 @@ public class EntornoAgent extends Agent {
                 protected ACLMessage handleRequest(ACLMessage request) {
                     return null;
             }
-            });
+            });*/
 
 
             //recorremos info_vehiculo para poner el estado actual.
@@ -306,20 +306,33 @@ public class EntornoAgent extends Agent {
         // FIN REGISTRO DF
 
 
-        /* MessageTemplate mt = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_QUERY);
+        MessageTemplate mt = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_QUERY);
         this.addBehaviour(new AchieveREResponder(this, mt) {
             protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {
+
+                // 2 posibilities (accident, nextobstacle)
+                String[] contentArray = request.getContent().split(",");
+                int elID = Integer.parseInt(contentArray[1]);
+
+                vehiculos[elID].pos_x = Integer.parseInt(contentArray[2]);
+                vehiculos[elID].pos_y = Integer.parseInt(contentArray[3]);
+                vehiculos[elID].velocidad = Integer.parseInt(contentArray[4]);
+                vehiculos[elID].direccion = Integer.parseInt(contentArray[5]);
+
+                //info_vehiculos.put(elID, aux);
+                //vehiculos[elID] = aux;
+
 
                 ACLMessage informDone  = request.createReply();
                 informDone.setPerformative(ACLMessage.INFORM);
                 informDone.setContent(request.getSender().getName());
-                System.out.println("recibido " + request.getSender().getName());
+                //System.out.println("recibido " + request.getSender().getName());
                 return informDone;
             }
             protected ACLMessage handleRequest(ACLMessage request) {
                 return null;
             }
-        }); */
+        });
 
         EntornoTickerBehaviour b = new EntornoTickerBehaviour(this, 3000);
         this.addBehaviour(b);

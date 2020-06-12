@@ -199,7 +199,7 @@ public class VehiculoAgent extends Agent {
         calleActual.ini_y = 0;
         calleActual.nombre = "laCalle";
         calleActual.fin_x = 0;
-        calleActual.fin_y = 200;
+        calleActual.fin_y = 4;
         calleActual.dir_x = 0;
         calleActual.dir_y = 1;
 
