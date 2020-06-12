@@ -72,11 +72,13 @@ public class OntologyParser {
         Property tieneLongitud    = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tieneLongitud");
         Property tienePosicionIni = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tienePosicionIni");
         Property tienePosicionFin = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tienePosicionFin");
+        Property tieneDireccion   = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tieneDireccion");
 
         EntornoAgent.Calle[] calles = new EntornoAgent.Calle[6];
         for (int i = 0; i < 6; i++) {
             int[] coord_ini = EntornoAgent.getCoord(indiv_calles[i].getPropertyValue(tienePosicionIni).asLiteral().getString());
             int[] coord_fin = EntornoAgent.getCoord(indiv_calles[i].getPropertyValue(tienePosicionFin).asLiteral().getString());
+            int[] direccion = EntornoAgent.getCoord(indiv_calles[i].getPropertyValue(tieneDireccion).asLiteral().getString());
 
             calles[i] = new EntornoAgent.Calle();
             calles[i].nombre = indiv_calles[i].getLocalName();
@@ -85,6 +87,9 @@ public class OntologyParser {
             calles[i].ini_y = coord_ini[1];
             calles[i].fin_x = coord_fin[0];
             calles[i].fin_y = coord_fin[1];
+            calles[i].dir_x = direccion[0];
+            calles[i].dir_y = direccion[1];
+
         }
         return calles;
     }

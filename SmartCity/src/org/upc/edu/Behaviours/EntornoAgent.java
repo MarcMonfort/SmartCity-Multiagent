@@ -55,7 +55,7 @@ public class EntornoAgent extends Agent {
         public int pos_y;
         public String calle1;
         public String calle2;
-        public String calleCerrada;
+        public String calleCerrada; //calle1 o calle2
 
     }
 
@@ -108,29 +108,14 @@ public class EntornoAgent extends Agent {
             System.out.println("  Pos : " + vehiculos[i].pos_x + ", " + vehiculos[i].pos_y);
             System.out.println("  Obj : " + vehiculos[i].obj_x + ", " + vehiculos[i].obj_y);
             System.out.println("  Vel : " + vehiculos[i].velocidad);
-            Object[] args = new Object[7];
+            Object[] args = new Object[3];
 
-            //String nombre_calle = vehiculos[i].calle_actual;
-            //int id_calle = Integer.parseInt(nombre_calle.substring(nombre_calle.length() - 1));
-            //args[0] = vehiculos[i].nombre;
+            String nombre_calle = vehiculos[i].calle_actual;
+            int id_calle = Integer.parseInt(nombre_calle.substring(nombre_calle.length() - 1)) - 1;
             args[0] = i; //id vehiculo... se podria obtener deel nombre...
-            args[1] = vehiculos[i].nombre;
-  /*           args[2] = vehiculos[i].pos_x;
-            args[3] = vehiculos[i].pos_y;
-            args[4] = vehiculos[i].obj_x;
-            args[5] = vehiculos[i].obj_y; */
-            
-            args[2] = vehiculos[i].calle_actual;
-            /* args[7] = calles[id_calle].ini_x;
-            args[8] = calles[id_calle].ini_y;
-            args[9] = calles[id_calle].fin_x;
-            args[10] = calles[id_calle].fin_y;
-            args[11] = calles[id_calle].dir_x;
-            args[12] = calles[id_calle].dir_y;
-            args[13] = calles[id_calle].longitud; */
+            args[1] = vehiculos[i];
+            args[2] = calles[id_calle];
 
-
-            //args[6] = vehiculos[i].velocidad;
             AgentController ac = cc.createNewAgent(vehiculos[i].nombre, "org.upc.edu.Behaviours.VehiculoAgent", args);
             ac.start();
         }
@@ -145,7 +130,21 @@ public class EntornoAgent extends Agent {
 
             System.out.println("  Pos : " + semaforos[i].pos_x + ", " + semaforos[i].pos_y);
             System.out.println("  CalleCerrada : " + semaforos[i].calleCerrada);
+            Object[] args = new Object[4];
 
+            String nombre_calle1 = semaforos[i].calle1;
+            String nombre_calle2 = semaforos[i].calle2;
+
+            int id_calle1 = Integer.parseInt(nombre_calle1.substring(nombre_calle1.length() - 1)) - 1;
+            int id_calle2 = Integer.parseInt(nombre_calle2.substring(nombre_calle2.length() - 1)) - 1;
+
+            args[0] = i; //id semaforo... se podria obtener deel nombre...
+            args[1] = semaforos[i];
+            args[2] = calles[id_calle1];
+            args[3] = calles[id_calle2];
+
+            AgentController ac = cc.createNewAgent(semaforos[i].nombre, "org.upc.edu.Behaviours.SemaforoAgent", args);
+            ac.start();
         }
     }
 

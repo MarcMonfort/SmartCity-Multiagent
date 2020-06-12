@@ -184,15 +184,8 @@ public class VehiculoAgent extends Agent {
         Object[] args = getArguments();
         myID = (Integer) args[0];
 
-        String JENA = "./";
-        String File = "Ontologia.owl";
-        String NamingContext = "http://www.semanticweb.org/sid/smartCity";
-        OntologyParser parser = new OntologyParser(JENA, File, NamingContext);
-        parser.loadOntology();
-
-
-        miVehiculo = parser.getVehiculo((String) args[1]);
-        calleActual = parser.getCalle((String) args[2]);
+        miVehiculo = (EntornoAgent.Vehiculo) args[1];
+        calleActual = (EntornoAgent.Calle) args[2];
 
         miVehiculo.velocidad = 1;
 
@@ -216,7 +209,7 @@ public class VehiculoAgent extends Agent {
             e.printStackTrace();
         }
         // FIN REGISTRO DF
-        System.out.println("agente : " + this.getLocalName() + "registrado!!!");
+        System.out.println("agente : " + this.getLocalName() + " registrado!!!");
 
         VehiculoTickerBehaviour b = new VehiculoTickerBehaviour(this, 3000);
         this.addBehaviour(b);
