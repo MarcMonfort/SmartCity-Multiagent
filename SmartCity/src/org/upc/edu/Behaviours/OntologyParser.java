@@ -89,6 +89,35 @@ public class OntologyParser {
         return calles;
     }
 
+    public EntornoAgent.Calle getCalle(String name_calle) {
+        EntornoAgent.Calle calle;
+        Individual indiv;
+        String url = "http://www.semanticweb.org/sid/smartCity#" + name_calle;
+        indiv = model.getIndividual(url);
+
+        Property tieneLongitud    = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tieneLongitud");
+        Property tienePosicionIni = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tienePosicionIni");
+        Property tienePosicionFin = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tienePosicionFin");
+        Property tieneDireccion   = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tieneDireccion");
+        
+        int[] coord_ini = EntornoAgent.getCoord(indiv.getPropertyValue(tienePosicionIni).asLiteral().getString());
+        int[] coord_fin = EntornoAgent.getCoord(indiv.getPropertyValue(tienePosicionFin).asLiteral().getString());
+        int[] direccion = EntornoAgent.getCoord(indiv.getPropertyValue(tieneDireccion).asLiteral().getString());
+
+        calle = new EntornoAgent.Calle();
+        calle.nombre = indiv.getLocalName();
+        calle.longitud = indiv.getPropertyValue(tieneLongitud).asLiteral().getInt();
+        calle.ini_x = coord_ini[0];
+        calle.ini_y = coord_ini[1];
+        calle.fin_x = coord_fin[0];
+        calle.fin_y = coord_fin[1];
+        calle.dir_x = direccion[0];
+        calle.dir_y = direccion[1];
+
+
+        return calle;
+    }
+
     public EntornoAgent.Vehiculo[] getVehiculos() {
         Individual[] indiv_vehiculos = new Individual[2];
         indiv_vehiculos[0] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Vehiculo1");
@@ -116,5 +145,32 @@ public class OntologyParser {
         }
         return vehiculos;
     }
+
+    public EntornoAgent.Vehiculo getVehiculo(String nombre) {
+        Individual indiv;
+
+        String url = "http://www.semanticweb.org/sid/smartCity#" + nombre;
+        indiv = model.getIndividual(url);
+
+        Property tienePosicion  = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tienePosicion");
+        Property tieneObjetivo  = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tieneObjetivo");
+        Property tieneVelocidad = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tieneVelocidad");
+        Property ocurreEn = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#ocurreEn");
+
+        EntornoAgent.Vehiculo vehiculo = new EntornoAgent.Vehiculo();
+
+        int[] pos = EntornoAgent.getCoord(indiv.getPropertyValue(tienePosicion).asLiteral().getString());
+        int[] obj = EntornoAgent.getCoord(indiv.getPropertyValue(tieneObjetivo).asLiteral().getString());
+
+        vehiculo.nombre = indiv.getLocalName();
+        vehiculo.calle_actual = indiv.getPropertyValue(ocurreEn).asResource().getLocalName();
+        vehiculo.velocidad = indiv.getPropertyValue(tieneVelocidad).asLiteral().getInt();
+        vehiculo.pos_x = pos[0];
+        vehiculo.pos_y = pos[1];
+        vehiculo.obj_x = obj[0];
+        vehiculo.obj_y = obj[1];
+        return vehiculo;
+    }
+
 
 }

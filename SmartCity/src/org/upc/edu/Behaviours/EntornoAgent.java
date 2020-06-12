@@ -45,11 +45,8 @@ public class EntornoAgent extends Agent {
         public int pos_y;
         public int obj_x;
         public int obj_y;
-        public int direccion = 0;
         public int velocidad;
         public String calle_actual;
-        public int[] carril_inter = {20,30};
-
     }
 
     public static class Semaforo {
@@ -112,14 +109,28 @@ public class EntornoAgent extends Agent {
             System.out.println("  Obj : " + vehiculos[i].obj_x + ", " + vehiculos[i].obj_y);
             System.out.println("  Vel : " + vehiculos[i].velocidad);
             Object[] args = new Object[7];
+
+            //String nombre_calle = vehiculos[i].calle_actual;
+            //int id_calle = Integer.parseInt(nombre_calle.substring(nombre_calle.length() - 1));
             //args[0] = vehiculos[i].nombre;
-            args[0] = i;
-            args[1] = vehiculos[i].calle_actual;
-            args[2] = vehiculos[i].pos_x;
+            args[0] = i; //id vehiculo... se podria obtener deel nombre...
+            args[1] = vehiculos[i].nombre;
+  /*           args[2] = vehiculos[i].pos_x;
             args[3] = vehiculos[i].pos_y;
             args[4] = vehiculos[i].obj_x;
-            args[5] = vehiculos[i].obj_y;
-            args[6] = vehiculos[i].velocidad;
+            args[5] = vehiculos[i].obj_y; */
+            
+            args[2] = vehiculos[i].calle_actual;
+            /* args[7] = calles[id_calle].ini_x;
+            args[8] = calles[id_calle].ini_y;
+            args[9] = calles[id_calle].fin_x;
+            args[10] = calles[id_calle].fin_y;
+            args[11] = calles[id_calle].dir_x;
+            args[12] = calles[id_calle].dir_y;
+            args[13] = calles[id_calle].longitud; */
+
+
+            //args[6] = vehiculos[i].velocidad;
             AgentController ac = cc.createNewAgent(vehiculos[i].nombre, "org.upc.edu.Behaviours.VehiculoAgent", args);
             ac.start();
         }
@@ -146,140 +157,17 @@ public class EntornoAgent extends Agent {
             super(a, period);
         }
 
-        public void onStart() {
-
-        }
-
-        /* public int onEnd() {
-            System.out.println("Bye..");
-            return 0;
-        } */
-
         public void onTick() {
-            //System.out.println("Vehiculo: Posicion, Velocidad, Dirección"); // print vector de info vehiculos
-            //System.out.println("Semaforo: Color"); // print vector de info semaforo
-            System.out.println(" "); // print vector de info semaforo
 
-            // AQUI SI FUNCIONA CON MULTIPLES AGENTES, ¿¿¿PORQUE???
-            /*MessageTemplate mt = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_QUERY);
-            myAgent.addBehaviour(new AchieveREResponder(myAgent, mt) {
-                protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {
-                    
-                    // 2 posibilities (accident, nextobstacle)
-                    String[] contentArray = request.getContent().split(",");
-                    int elID = Integer.parseInt(contentArray[1]);
-
-                    Vehiculo aux = new Vehiculo();
-                    vehiculos[elID].pos_x = Integer.parseInt(contentArray[2]);
-                    vehiculos[elID].pos_y = Integer.parseInt(contentArray[3]);
-                    vehiculos[elID].velocidad = Integer.parseInt(contentArray[4]);
-                    vehiculos[elID].direccion = Integer.parseInt(contentArray[5]);
-
-                    //info_vehiculos.put(elID, aux);
-                    //vehiculos[elID] = aux;
-
-
-                    ACLMessage informDone  = request.createReply();
-                    informDone.setPerformative(ACLMessage.INFORM);
-                    informDone.setContent(request.getSender().getName());
-                    //System.out.println("recibido " + request.getSender().getName());
-                    return informDone;
-                }
-                protected ACLMessage handleRequest(ACLMessage request) {
-                    return null;
-            }
-            });*/
-
-
-            //recorremos info_vehiculo para poner el estado actual.
-            /*for (String i : info_vehiculos.keySet()) {
-                Vehiculo v = info_vehiculos.get(i);
-                System.out.println(i + ": " + v.pos_x + "," + v.pos_y + "," + v.velocidad + "," + v.direccion );
-            }*/
+            System.out.println(" "); // print vector de info 
             for (Vehiculo v : vehiculos){
-                System.out.println(v.nombre + "= " + v.pos_x + "," + v.pos_y + "," + v.velocidad + "," + v.direccion );
+                System.out.println(v.nombre + "= " + v.pos_x + "," + v.pos_y + "," + v.velocidad);
             }
         }
 
     }
 
-    public class EntornoCyclicBehaviour extends CyclicBehaviour {
-
-        //MessageTemplate tmpl;
-
-        public EntornoCyclicBehaviour() {
-        }
-
-        /* public void onStart() {
-            tmpl = MessageTemplate.MatchSender((new AID("Termometro", AID.ISLOCALNAME)));
-        }
-
-        public int onEnd() {
-            System.out.println("Bye..");
-            return 0;
-        } */
-
-        public void action() {
-            final ACLMessage request = receive(); //usar filtro??
-
-            if (request != null) {
-                //if(request.get)
-                /* final AID sender = request.getSender();
-                final ACLMessage reply = request.createReply(); */
-                System.out.println("recibido algo...");
-            }
-            else {
-                block();
-            }
-
-
-            /* try {
-                final DFAgentDescription desc = new DFAgentDescription();
-                desc.setName(sender);
-                final DFAgentDescription[] search = DFService.search(EntornoAgent.this, getDefaultDF(), desc);
-                final Iterator services = search[0].getAllServices();
-                final ServiceDescription service = (ServiceDescription) services.next();
-                String content = request.getContent();
-                String[] contentArray = content.split(",");
-                //float volumeDischarged = Float.valueOf(contentArray[2]);
-                //float concentrationDischarged = Float.valueOf(contentArray[4].replace(")", ""));
-                if (true) {
-                    // DEBUG
-                    //illegalDischargesDetected += 1;
-                    //
-                    reply.setPerformative(ACLMessage.REQUEST);
-                    reply.setContent("papito");
-                } else {
-                    reply.setPerformative(ACLMessage.INFORM);
-                }
-                EntornoAgent.this.send(reply);
-
-
-                /* float currentMassOfPollutant = currentVolume * currentConcentration;  // Mass in g
-                float massOfPollutantDischarged = volumeDischarged * concentrationDischarged;  // Mass in g
-                float totalMassOfPollutant = currentMassOfPollutant + massOfPollutantDischarged;  // Mass in g
-                currentVolume += volumeDischarged;  // Volume in m3
-                currentConcentration = totalMassOfPollutant / currentVolume;  // Concentration in g/m3 */
-
-            /*} catch (FIPAException e) {
-                e.printStackTrace();
-            } */
-
-            /* ACLMessage msg = receive(tmpl);
-            if (msg != null) {
-                int n = Integer.parseInt(msg.getContent());
-
-                if (n < 15) System.out.println("calefacción encendida (" + n + "°C)");
-                else if (n > 25) System.out.println("refrigeración encendida (" + n + "°C)");
-                else System.out.println("temperatura adecuada (" + n + "°C)");
-            }
-            else {
-                block();
-            } */
-            //System.out.println("aaa");
-        }
-
-    }
+    
 
     protected void setup() {
 
@@ -317,16 +205,10 @@ public class EntornoAgent extends Agent {
                 vehiculos[elID].pos_x = Integer.parseInt(contentArray[2]);
                 vehiculos[elID].pos_y = Integer.parseInt(contentArray[3]);
                 vehiculos[elID].velocidad = Integer.parseInt(contentArray[4]);
-                vehiculos[elID].direccion = Integer.parseInt(contentArray[5]);
-
-                //info_vehiculos.put(elID, aux);
-                //vehiculos[elID] = aux;
-
 
                 ACLMessage informDone  = request.createReply();
                 informDone.setPerformative(ACLMessage.INFORM);
-                informDone.setContent(request.getSender().getName());
-                //System.out.println("recibido " + request.getSender().getName());
+                informDone.setContent("mensaje para ..." + request.getSender().getName());
                 return informDone;
             }
             protected ACLMessage handleRequest(ACLMessage request) {
@@ -337,7 +219,5 @@ public class EntornoAgent extends Agent {
         EntornoTickerBehaviour b = new EntornoTickerBehaviour(this, 3000);
         this.addBehaviour(b);
 
-        EntornoCyclicBehaviour b2 = new EntornoCyclicBehaviour();
-        this.addBehaviour(b2);
     }
 }

@@ -27,7 +27,7 @@ public class VehiculoAgent extends Agent {
 
     String vID;
 
-    int dist_next_obstacle = 99;
+    int dist_next_obstacle;
 
     EntornoAgent.Vehiculo miVehiculo;
     EntornoAgent.Calle calleActual; // voy a suponer que sabe en que calle esta
@@ -124,11 +124,12 @@ public class VehiculoAgent extends Agent {
                     aclMessage.setProtocol(FIPANames.InteractionProtocol.FIPA_QUERY);
                     aclMessage.setSender(VehiculoAgent.this.getAID());
                     aclMessage.addReceiver(environment);
-                    aclMessage.setContent("setCar," + myID + "," + miVehiculo.pos_x + "," + miVehiculo.pos_y + "," + miVehiculo.velocidad + "," + miVehiculo.direccion);
+                    aclMessage.setContent("setCar," + myID + "," + miVehiculo.pos_x + "," + miVehiculo.pos_y + "," + miVehiculo.velocidad);
 
                     myAgent.addBehaviour(new AchieveREInitiator(myAgent, aclMessage) {
                         //@override???
                         protected void handleInform(ACLMessage inform) {
+                            System.out.println(inform.getContent());
                             //double t = Double.parseDouble(inform.getContent());
                             //System.out.println(VehiculoAgent.this.getName() + " == " + inform.getContent()); //
                             
@@ -179,29 +180,24 @@ public class VehiculoAgent extends Agent {
     }
 
     protected void setup() {
-        /* Object[] args = getArguments();
-        vID = (String) args[0];
-        System.out.println(vID); */
-        miVehiculo = new EntornoAgent.Vehiculo();
-        calleActual = new EntornoAgent.Calle();
 
         Object[] args = getArguments();
-        //miVehiculo.nombre = (String) args[0];
         myID = (Integer) args[0];
 
-        miVehiculo.pos_x = (Integer) args[2];
-        miVehiculo.pos_y = (Integer) args[3];
-        miVehiculo.obj_x = (Integer) args[4];
-        miVehiculo.obj_y = (Integer) args[5];
-        miVehiculo.velocidad = 1;//(Integer) args[6];
+        String JENA = "./";
+        String File = "Ontologia.owl";
+        String NamingContext = "http://www.semanticweb.org/sid/smartCity";
+        OntologyParser parser = new OntologyParser(JENA, File, NamingContext);
+        parser.loadOntology();
 
-        calleActual.ini_x = 0;
-        calleActual.ini_y = 0;
-        calleActual.nombre = "laCalle";
-        calleActual.fin_x = 0;
-        calleActual.fin_y = 4;
-        calleActual.dir_x = 0;
-        calleActual.dir_y = 1;
+
+        miVehiculo = parser.getVehiculo((String) args[1]);
+        calleActual = parser.getCalle((String) args[2]);
+
+        miVehiculo.velocidad = 1;
+
+        
+        dist_next_obstacle = -1;
 
 
 
