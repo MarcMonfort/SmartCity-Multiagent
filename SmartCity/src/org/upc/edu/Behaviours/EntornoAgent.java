@@ -50,7 +50,17 @@ public class EntornoAgent extends Agent {
         public String calle_actual;
         public int[] carril_inter = {20,30};
 
-    };
+    }
+
+    public static class Semaforo {
+        public String nombre;
+        public int pos_x;
+        public int pos_y;
+        public String calle1;
+        public String calle2;
+        public String calleCerrada;
+
+    }
 
     public static int[] getCoord(String c) {
         String[] nums = c.split(",");
@@ -65,7 +75,8 @@ public class EntornoAgent extends Agent {
     private HashMap<String, Vehiculo> info_vehiculos = new HashMap<>();
     private Calle[] calles;
     private Vehiculo[] vehiculos;
-
+    private Semaforo[] semaforos;
+    
     private void inicializarEntorno() throws StaleProxyException {
         String JENA = "./";
         String File = "Ontologia.owl";
@@ -113,7 +124,18 @@ public class EntornoAgent extends Agent {
             ac.start();
         }
 
+        System.out.println("INSTANCIAS DE SEMAFOROS:");
+        semaforos = parser.getSemaforos();
 
+        for (int i = 0; i < semaforos.length; i++) {
+            System.out.println(semaforos[i].nombre + ":");
+            System.out.println("  Calle1 : " + semaforos[i].calle1);
+            System.out.println("  Calle2 : " + semaforos[i].calle2);
+
+            System.out.println("  Pos : " + semaforos[i].pos_x + ", " + semaforos[i].pos_y);
+            System.out.println("  CalleCerrada : " + semaforos[i].calleCerrada);
+
+        }
     }
 
     public class EntornoTickerBehaviour extends TickerBehaviour {
