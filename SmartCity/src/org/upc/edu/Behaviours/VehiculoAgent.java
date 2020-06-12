@@ -43,7 +43,7 @@ public class VehiculoAgent extends Agent {
 
     int iter = 3;
 
-    int elID;
+    String vID;
 
 
 
@@ -109,7 +109,7 @@ public class VehiculoAgent extends Agent {
                     aclMessage.setProtocol(FIPANames.InteractionProtocol.FIPA_QUERY);
                     aclMessage.setSender(VehiculoAgent.this.getAID());
                     aclMessage.addReceiver(environment);
-                    aclMessage.setContent(elID + "," + pos_x + "," + pos_y + "," + velocidad + "," + direccion);
+                    aclMessage.setContent(vID + "," + pos_x + "," + pos_y + "," + velocidad + "," + direccion);
 
                     myAgent.addBehaviour(new AchieveREInitiator(myAgent, aclMessage) {
                         //@override???
@@ -185,8 +185,8 @@ public class VehiculoAgent extends Agent {
 
     protected void setup() {
         Object[] args = getArguments();
-        elID = Integer.parseInt((String) args[0]);
-        System.out.println(elID);
+        vID = (String) args[0];
+        System.out.println(vID);
 
         // REGISTRO DF
         final DFAgentDescription desc = new DFAgentDescription();
@@ -203,6 +203,7 @@ public class VehiculoAgent extends Agent {
             e.printStackTrace();
         }
         // FIN REGISTRO DF
+        System.out.println("agente : " + this.getLocalName() + "registrado!!!");
 
         VehiculoTickerBehaviour b = new VehiculoTickerBehaviour(this, 3000);
         this.addBehaviour(b);

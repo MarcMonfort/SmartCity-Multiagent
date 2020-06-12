@@ -1,15 +1,12 @@
 package org.upc.edu.Behaviours;
 
-import javafx.util.Pair;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.rdf.model.Property;
-import org.upc.edu.jenatest.Main;
 
-import java.util.ArrayList;
 
 public class OntologyParser {
     OntModel model;

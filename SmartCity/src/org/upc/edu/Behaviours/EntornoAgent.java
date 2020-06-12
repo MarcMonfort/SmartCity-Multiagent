@@ -5,7 +5,6 @@
 
 package org.upc.edu.Behaviours;
 
-import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
@@ -17,11 +16,11 @@ import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
+import jade.wrapper.AgentController;
+import jade.wrapper.ContainerController;
+import jade.wrapper.StaleProxyException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Random;
 
 /**
  * @author igomez
@@ -60,7 +59,58 @@ public class EntornoAgent extends Agent {
 
     //private ArrayList<Vehiculo> info_vehiculos;
 
-    private HashMap<Integer, Vehiculo> info_vehiculo = new HashMap<Integer, Vehiculo>();
+    private HashMap<Integer, Vehiculo> info_vehiculos = new HashMap<Integer, Vehiculo>();
+    private Calle[] calles;
+    private Vehiculo[] vehiculos;
+
+    private void inicializarEntorno() throws StaleProxyException {
+        String JENA = "./";
+        String File = "Ontologia.owl";
+        String NamingContext = "http://www.semanticweb.org/sid/smartCity";
+
+        System.out.println("----------------Starting program -------------");
+
+        OntologyParser parser = new OntologyParser(JENA, File, NamingContext);
+
+        System.out.println("Load the Ontology");
+        parser.loadOntology();
+        System.out.println("------------------");
+
+        System.out.println("INSTANCIAS DE CALLES:");
+        calles = parser.getCalles();
+
+        for (int i = 0; i < calles.length; i++) {
+            System.out.println(calles[i].nombre + ":");
+            System.out.println("  Longitud: " + calles[i].longitud);
+            System.out.println("  Pos ini : " + calles[i].ini_x + ", " + calles[i].ini_y);
+            System.out.println("  Pos fin : " + calles[i].fin_x + ", " + calles[i].fin_y);
+
+        }
+
+        System.out.println("INSTANCIAS DE VEHICULOS:");
+        vehiculos = parser.getVehiculos();
+
+        ContainerController cc = getContainerController();
+        for (int i = 0; i < vehiculos.length; i++) {
+            System.out.println(vehiculos[i].nombre + ":");
+            System.out.println("  Calle: " + vehiculos[i].calle_actual);
+            System.out.println("  Pos : " + vehiculos[i].pos_x + ", " + vehiculos[i].pos_y);
+            System.out.println("  Obj : " + vehiculos[i].obj_x + ", " + vehiculos[i].obj_y);
+            System.out.println("  Vel : " + vehiculos[i].velocidad);
+            Object[] args = new Object[7];
+            args[0] = vehiculos[i].nombre;
+            args[1] = vehiculos[i].calle_actual;
+            args[2] = vehiculos[i].pos_x;
+            args[3] = vehiculos[i].pos_y;
+            args[4] = vehiculos[i].obj_x;
+            args[5] = vehiculos[i].obj_y;
+            args[6] = vehiculos[i].velocidad;
+            AgentController ac = cc.createNewAgent(vehiculos[i].nombre, "org.upc.edu.Behaviours.VehiculoAgent", args);
+            ac.start();
+        }
+
+
+    }
 
     public class EntornoTickerBehaviour extends TickerBehaviour {
 
@@ -70,11 +120,9 @@ public class EntornoAgent extends Agent {
             super(a, period);
         }
 
-        /* public void onStart() {
-            msg = new ACLMessage(ACLMessage.INFORM);
-            msg.addReceiver(new AID("Termostato", AID.ISLOCALNAME));
-            msg.setSender(getAID());
-        } */
+        public void onStart() {
+
+        }
 
         /* public int onEnd() {
             System.out.println("Bye..");
@@ -100,7 +148,7 @@ public class EntornoAgent extends Agent {
                     aux.velocidad = Integer.parseInt(contentArray[3]);
                     aux.direccion = Integer.parseInt(contentArray[4]);
 
-                    info_vehiculo.put(elID, aux);
+                    info_vehiculos.put(elID, aux);
 
                     ACLMessage informDone  = request.createReply();
                     informDone.setPerformative(ACLMessage.INFORM);
@@ -115,8 +163,8 @@ public class EntornoAgent extends Agent {
 
 
             //recorremos info_vehiculo para poner el estado actual.
-            for (Integer i : info_vehiculo.keySet()) {
-                Vehiculo v = info_vehiculo.get(i);
+            for (Integer i : info_vehiculos.keySet()) {
+                Vehiculo v = info_vehiculos.get(i);
                 System.out.println(i + ": " + v.pos_x + "," + v.pos_y + "," + v.velocidad + "," + v.direccion );
             }
         }
@@ -202,6 +250,13 @@ public class EntornoAgent extends Agent {
     }
 
     protected void setup() {
+
+        try {
+            inicializarEntorno();
+        } catch (StaleProxyException e) {
+            e.printStackTrace();
+        }
+
         // REGISTRO DF
         final DFAgentDescription desc = new DFAgentDescription();
         desc.setName(getAID());
