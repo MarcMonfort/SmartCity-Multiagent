@@ -24,32 +24,20 @@ import java.util.Random;
  */
 public class VehiculoAgent extends Agent {
 
-    int pos_x = 0;
-    int pos_y = 0;
-
-    int direccion = 0;
-
-    int velocidad = 0; // velocidad 1 o 0
-    //int aceleracion = 1;
-
-    int carril_fin_x = 2;
-    int carril_fin_y = 0; 
-
-    int[] carril_inter = {20,30};
-
-    int dist_next_obstacle = 0; //-1 == infinite
-
-    boolean all_green = true;
-
-    int iter = 3;
 
     String vID;
+
+    int dist_next_obstacle = 99;
+
+    EntornoAgent.Vehiculo miVehiculo;
+    EntornoAgent.Calle calleActual; // voy a suponer que sabe en que calle esta
+    int myID;
 
 
 
     public class VehiculoTickerBehaviour extends TickerBehaviour {
 
-        ACLMessage msg;
+        //ACLMessage msg;
 
         public VehiculoTickerBehaviour(Agent a, long period) {
             super(a, period);
@@ -70,31 +58,58 @@ public class VehiculoAgent extends Agent {
             // mirar si se llega al final del carril
             boolean fin_calle = false;
 
-            switch(direccion) {
-                case 0: //right
-                    pos_x += velocidad; 
-                    break;
-                case 1: //left
-                    pos_x -= velocidad; 
-                    break;
-                case 2: //up
-                    pos_y += velocidad; 
-                    break;
-                case 3: //down
-                    pos_y -= velocidad; 
-                    break;
+            miVehiculo.pos_x += miVehiculo.velocidad * calleActual.dir_x;
+            miVehiculo.pos_y += miVehiculo.velocidad * calleActual.dir_y;
+
+            if (miVehiculo.pos_x == calleActual.fin_x && miVehiculo.pos_y == calleActual.fin_y){
+                miVehiculo.velocidad = 0;
+                System.out.println("Ha llegado al final de la calle");
+                // preguntar siguientes calles
             }
-            if (pos_x == carril_fin_x && pos_y == carril_fin_y){
-                velocidad = 0;
-                // preguntar siguiente carretera
+
+
+            if (dist_next_obstacle == 0) { // tanto si es otro vehiculo o un semaforo rojo
+                System.out.println("va a chocar...");
+                miVehiculo.velocidad = 0;
+
+                /*final DFAgentDescription desc = new DFAgentDescription();
+                final ServiceDescription sdesc = new ServiceDescription();
+                sdesc.setType("Entorno");
+                desc.addServices(sdesc);
+                try {
+                    final DFAgentDescription[] environments = DFService.search(VehiculoAgent.this, getDefaultDF(), desc, new SearchConstraints());
+                    final AID environment = environments[0].getName();
+                    final ACLMessage aclMessage = new ACLMessage(ACLMessage.QUERY_IF);
+
+                    aclMessage.setProtocol(FIPANames.InteractionProtocol.FIPA_QUERY);
+                    aclMessage.setSender(VehiculoAgent.this.getAID());
+                    aclMessage.addReceiver(environment);
+                    aclMessage.setContent("checkCar," + myID + "," + miVehiculo.pos_x + "," + miVehiculo.pos_y + "," + miVehiculo.velocidad + "," + miVehiculo.direccion);
+
+                    myAgent.addBehaviour(new AchieveREInitiator(myAgent, aclMessage) {
+                        //@override???
+                        protected void handleInform(ACLMessage inform) {
+                            //double t = Double.parseDouble(inform.getContent());
+                            //System.out.println(VehiculoAgent.this.getName() + " == " + inform.getContent()); //
+
+                        }
+                    });
+
+
+                    //VehiculoAgent.this.send(aclMessage);
+
+                    //System.out.println("ha superado el send!");
+                    //iter = 4;
+                } catch (FIPAException e) {
+                    e.printStackTrace();
+                }*/
             }
-            if (dist_next_obstacle == 1) {
-                velocidad = 0;
+            else {
+                --dist_next_obstacle; // reducimos distancia al objeto mas cercano
             }
 
             
-            --dist_next_obstacle; // reducimos distancia al objeto mas cercano
-            
+
             // Establece posicion y recibe next obstacle en cada tick
             if (true) {
                 final DFAgentDescription desc = new DFAgentDescription();
@@ -109,13 +124,13 @@ public class VehiculoAgent extends Agent {
                     aclMessage.setProtocol(FIPANames.InteractionProtocol.FIPA_QUERY);
                     aclMessage.setSender(VehiculoAgent.this.getAID());
                     aclMessage.addReceiver(environment);
-                    aclMessage.setContent(vID + "," + pos_x + "," + pos_y + "," + velocidad + "," + direccion);
+                    aclMessage.setContent("setCar," + myID + "," + miVehiculo.pos_x + "," + miVehiculo.pos_y + "," + miVehiculo.velocidad + "," + miVehiculo.direccion);
 
                     myAgent.addBehaviour(new AchieveREInitiator(myAgent, aclMessage) {
                         //@override???
                         protected void handleInform(ACLMessage inform) {
                             //double t = Double.parseDouble(inform.getContent());
-                            System.out.println(VehiculoAgent.this.getName() + " == " + inform.getContent()); //
+                            //System.out.println(VehiculoAgent.this.getName() + " == " + inform.getContent()); //
                             
                         }
                     });
@@ -123,8 +138,8 @@ public class VehiculoAgent extends Agent {
                     
                     //VehiculoAgent.this.send(aclMessage);
                     
-                    System.out.println("ha superado el send!");
-                    iter = 4;
+                    //System.out.println("ha superado el send!");
+                    //iter = 4;
                 } catch (FIPAException e) {
                     e.printStackTrace();
                 }
@@ -157,26 +172,6 @@ public class VehiculoAgent extends Agent {
                 }
             } */
 
-            // repetido
-            /* if (true) { //query algun obstaculo???
-                final DFAgentDescription desc = new DFAgentDescription();
-                final ServiceDescription sdesc = new ServiceDescription();
-                sdesc.setType("Entorno");
-                desc.addServices(sdesc);
-                try {
-                    final DFAgentDescription[] environments = DFService.search(VehiculoAgent.this, getDefaultDF(), desc, new SearchConstraints());
-                    final AID environment = environments[0].getName();
-                    final ACLMessage aclMessage = new ACLMessage(ACLMessage.QUERY_IF);
-                    aclMessage.setSender(VehiculoAgent.this.getAID());
-                    aclMessage.addReceiver(environment);
-                    aclMessage.setContent("obstacle");
-                    VehiculoAgent.this.send(aclMessage);
-                    
-                    System.out.println("hay obstaculo?");
-                } catch (FIPAException e) {
-                    e.printStackTrace();
-                }
-            } */
 
 
         }
@@ -184,9 +179,31 @@ public class VehiculoAgent extends Agent {
     }
 
     protected void setup() {
-        Object[] args = getArguments();
+        /* Object[] args = getArguments();
         vID = (String) args[0];
-        System.out.println(vID);
+        System.out.println(vID); */
+        miVehiculo = new EntornoAgent.Vehiculo();
+        calleActual = new EntornoAgent.Calle();
+
+        Object[] args = getArguments();
+        //miVehiculo.nombre = (String) args[0];
+        myID = (Integer) args[0];
+
+        miVehiculo.pos_x = (Integer) args[2];
+        miVehiculo.pos_y = (Integer) args[3];
+        miVehiculo.obj_x = (Integer) args[4];
+        miVehiculo.obj_y = (Integer) args[5];
+        miVehiculo.velocidad = 1;//(Integer) args[6];
+
+        calleActual.ini_x = 0;
+        calleActual.ini_y = 0;
+        calleActual.nombre = "laCalle";
+        calleActual.fin_x = 0;
+        calleActual.fin_y = 200;
+        calleActual.dir_x = 0;
+        calleActual.dir_y = 1;
+
+
 
         // REGISTRO DF
         final DFAgentDescription desc = new DFAgentDescription();

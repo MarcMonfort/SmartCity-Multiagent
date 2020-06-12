@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="JenaLibs">
+    <CLASSES>
+      <root url="file://$PROJECT_DIR$/lib/JenaLibs" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+    <jarDirectory url="file://$PROJECT_DIR$/lib/JenaLibs" recursive="false" />
+  </library>
+</component>

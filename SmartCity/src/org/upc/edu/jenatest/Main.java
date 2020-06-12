@@ -5,9 +5,9 @@
 
 package org.upc.edu.jenatest;
 
-import javafx.util.Pair;
+//import javafx.util.Pair;
 import org.apache.jena.base.Sys;
-import org.omg.CORBA.Environment;
+//import org.omg.CORBA.Environment;
 import org.upc.edu.Behaviours.EntornoAgent;
 import org.upc.edu.Behaviours.OntologyParser;
 import org.upc.edu.Behaviours.VehiculoAgent;

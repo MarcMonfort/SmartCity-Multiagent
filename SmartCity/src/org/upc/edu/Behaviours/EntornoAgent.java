@@ -34,9 +34,12 @@ public class EntornoAgent extends Agent {
         public int ini_y;
         public int fin_x;
         public int fin_y;
+        public int dir_x;
+        public int dir_y;
     }
 
     public static class Vehiculo {
+        public int ID;
         public String nombre;
         public int pos_x;
         public int pos_y;
@@ -59,7 +62,7 @@ public class EntornoAgent extends Agent {
 
     //private ArrayList<Vehiculo> info_vehiculos;
 
-    private HashMap<Integer, Vehiculo> info_vehiculos = new HashMap<Integer, Vehiculo>();
+    private HashMap<String, Vehiculo> info_vehiculos = new HashMap<>();
     private Calle[] calles;
     private Vehiculo[] vehiculos;
 
@@ -98,7 +101,8 @@ public class EntornoAgent extends Agent {
             System.out.println("  Obj : " + vehiculos[i].obj_x + ", " + vehiculos[i].obj_y);
             System.out.println("  Vel : " + vehiculos[i].velocidad);
             Object[] args = new Object[7];
-            args[0] = vehiculos[i].nombre;
+            //args[0] = vehiculos[i].nombre;
+            args[0] = i;
             args[1] = vehiculos[i].calle_actual;
             args[2] = vehiculos[i].pos_x;
             args[3] = vehiculos[i].pos_y;
@@ -130,8 +134,9 @@ public class EntornoAgent extends Agent {
         } */
 
         public void onTick() {
-            System.out.println("Vehiculo: Posicion, Velocidad, Dirección"); // print vector de info vehiculos
-            System.out.println("Semaforo: Color"); // print vector de info semaforo
+            //System.out.println("Vehiculo: Posicion, Velocidad, Dirección"); // print vector de info vehiculos
+            //System.out.println("Semaforo: Color"); // print vector de info semaforo
+            System.out.println(" "); // print vector de info semaforo
 
             // AQUI SI FUNCIONA CON MULTIPLES AGENTES, ¿¿¿PORQUE???
             MessageTemplate mt = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_QUERY);
@@ -140,20 +145,22 @@ public class EntornoAgent extends Agent {
                     
                     // 2 posibilities (accident, nextobstacle)
                     String[] contentArray = request.getContent().split(",");
-                    int elID = Integer.parseInt(contentArray[0]);
+                    int elID = Integer.parseInt(contentArray[1]);
 
                     Vehiculo aux = new Vehiculo();
-                    aux.pos_x = Integer.parseInt(contentArray[1]);
-                    aux.pos_y = Integer.parseInt(contentArray[2]);
-                    aux.velocidad = Integer.parseInt(contentArray[3]);
-                    aux.direccion = Integer.parseInt(contentArray[4]);
+                    aux.pos_x = Integer.parseInt(contentArray[2]);
+                    aux.pos_y = Integer.parseInt(contentArray[3]);
+                    aux.velocidad = Integer.parseInt(contentArray[4]);
+                    aux.direccion = Integer.parseInt(contentArray[5]);
 
-                    info_vehiculos.put(elID, aux);
+                    //info_vehiculos.put(elID, aux);
+                    vehiculos[elID] = aux;
+
 
                     ACLMessage informDone  = request.createReply();
                     informDone.setPerformative(ACLMessage.INFORM);
                     informDone.setContent(request.getSender().getName());
-                    System.out.println("recibido " + request.getSender().getName());
+                    //System.out.println("recibido " + request.getSender().getName());
                     return informDone;
                 }
                 protected ACLMessage handleRequest(ACLMessage request) {
@@ -163,9 +170,12 @@ public class EntornoAgent extends Agent {
 
 
             //recorremos info_vehiculo para poner el estado actual.
-            for (Integer i : info_vehiculos.keySet()) {
+            /*for (String i : info_vehiculos.keySet()) {
                 Vehiculo v = info_vehiculos.get(i);
                 System.out.println(i + ": " + v.pos_x + "," + v.pos_y + "," + v.velocidad + "," + v.direccion );
+            }*/
+            for (Vehiculo v : vehiculos){
+                System.out.println(v.nombre + "= " + v.pos_x + "," + v.pos_y + "," + v.velocidad + "," + v.direccion );
             }
         }
 
