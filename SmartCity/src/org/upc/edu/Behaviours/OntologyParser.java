@@ -5,6 +5,7 @@ import org.apache.jena.ontology.OntDocumentManager;
 import org.apache.jena.ontology.OntModel;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.rdf.model.NodeIterator;
 import org.apache.jena.rdf.model.Property;
 
 
@@ -28,6 +29,35 @@ public class OntologyParser {
         dm.addAltEntry(NamingContext,
                 "file:" + JENAPath + OntologyFile);
         model.read(NamingContext);
+    }
+
+    public EntornoAgent.Semaforo[] getSemaforos() {
+        Individual[] indiv_semaforos = new Individual[3];
+        indiv_semaforos[0] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Semaforo1");
+        indiv_semaforos[1] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Semaforo2");
+        indiv_semaforos[2] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Semaforo3");
+
+        Property tienePosicion  = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tienePosicion");
+        Property cierraPasoA  = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#cierraPasoA");
+        Property ocurreEn  = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#ocurreEn");
+
+        EntornoAgent.Semaforo[] semaforos = new EntornoAgent.Semaforo[3];
+        for (int i = 0; i < 3; i++) {
+            semaforos[i] = new EntornoAgent.Semaforo();
+
+            semaforos[i].nombre = indiv_semaforos[i].getLocalName();
+
+            int[] pos = EntornoAgent.getCoord(indiv_semaforos[i].getPropertyValue(tienePosicion).asLiteral().getString());
+            semaforos[i].pos_x = pos[0];
+            semaforos[i].pos_y = pos[1];
+
+            NodeIterator it = indiv_semaforos[i].listPropertyValues(ocurreEn);
+            semaforos[i].calle1 = it.next().asResource().getLocalName();
+            semaforos[i].calle2 = it.next().asResource().getLocalName();
+
+            semaforos[i].calleCerrada = indiv_semaforos[i].getPropertyValue(cierraPasoA).asResource().getLocalName();
+        }
+        return semaforos;
     }
 
     public EntornoAgent.Calle[] getCalles() {
