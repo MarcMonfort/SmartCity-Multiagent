@@ -150,6 +150,12 @@ public class EntornoAgent extends Agent {
             AgentController ac = cc.createNewAgent(semaforos[i].nombre, "org.upc.edu.Behaviours.SemaforoAgent", args);
             ac.start();
         }
+
+        Object[] args = new Object[1];
+        args[0] = semaforos;
+        //args[1] = calles
+        AgentController ac = cc.createNewAgent("CentroDeDatos", "org.upc.edu.Behaviours.CloudAgent", args);
+        ac.start();
     }
 
     public class EntornoTickerBehaviour extends TickerBehaviour {
