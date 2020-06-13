@@ -33,6 +33,9 @@ public class SemaforoAgent extends Agent {
 
     int myID;
 
+    AID cloudAID;
+
+
     private boolean calleAbiertaVacia() {
         return true;
     }
@@ -161,8 +164,27 @@ public class SemaforoAgent extends Agent {
         // FIN REGISTRO DF
         System.out.println("agente : " + this.getLocalName() + " registrado!!!");
 
-        SemaforoTickerBehaviour b = new SemaforoTickerBehaviour(this, 1000);
-        this.addBehaviour(b);
+
+        //Busca cloudAID
+
+        DFAgentDescription search_template;
+        ServiceDescription sd  = new ServiceDescription();
+        sd.setType( "Cloud" );
+        search_template = new DFAgentDescription();
+        search_template.addServices(sd);
+
+        DFAgentDescription[] search_results;
+        try {
+            search_results = DFService.search(myAgent, search_template);
+            if (search_results.length > 0) {
+                cloudAID = search_results[0].getName();
+                System.out.println(this.getLocalName() + " : CloudAgent encontrado");
+            }
+        } catch (FIPAException ex) {
+            System.out.println("Agente " + this.getLocalName() + ": Error al buscar al cloud");
+        }
+
+
 
         //Responder a la peticion del coche de ponerse verde
         MessageTemplate mt = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
@@ -191,5 +213,9 @@ public class SemaforoAgent extends Agent {
                 return null;
             }
         });
+
+
+        SemaforoTickerBehaviour b = new SemaforoTickerBehaviour(this, 1000);
+        this.addBehaviour(b);
     }
 }

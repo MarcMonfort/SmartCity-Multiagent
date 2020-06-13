@@ -39,9 +39,12 @@ public class EntornoAgent extends Agent {
         public int dir_x;
         public int dir_y;
         
+        public String nombre_sig;
         public Calle siguiente;
+        public ArrayList<String> nombre_inter; //null
         public ArrayList<Calle> inter; //null
 
+        public ArrayList<String> nombre_semaforos; //arrasy list
         public ArrayList<Semaforo> semaforos; //arrasy list
     }
 
@@ -150,8 +153,28 @@ public class EntornoAgent extends Agent {
         System.out.println("INSTANCIAS DE VEHICULOS:");
         vehiculos = parser.getVehiculos();
 
-        for (Vehiculo v : vehiculos) { //relaciona calles con calles
-            //objetos con objetos
+        // crea objetos calle siguiente i calle interseccion (actuan como punteros)
+        for (Calle c : calles) { //relaciona calles con calles
+            String sig = c.nombre_sig;
+            int id_calle = Integer.parseInt(sig.substring(sig.length() - 1)) - 1;
+            c.siguiente = calles[id_calle];
+
+            ArrayList<Calle> intersecciones = new ArrayList<>();
+            for (String nombre_inter : c.nombre_inter){
+                id_calle = Integer.parseInt(nombre_inter.substring(nombre_inter.length() - 1)) - 1;
+                intersecciones.add(calles[id_calle]);
+            }
+            c.inter = intersecciones;
+
+            ArrayList<Semaforo> lista_semaforos = new ArrayList<>();
+            for (String nombre_semaforo : c.nombre_semaforos){
+                int id_semaforo = Integer.parseInt(nombre_semaforo.substring(nombre_semaforo.length() - 1)) - 1;
+                lista_semaforos.add(semaforos[id_semaforo]);
+            }
+            c.semaforos = lista_semaforos;
+
+
+            // objetos con objetos
             // si no funciona ultima solucion obtenerlo en la clase vehiculo
         }
 
@@ -188,6 +211,7 @@ public class EntornoAgent extends Agent {
             for (Vehiculo v : vehiculos){
                 System.out.println(v.nombre + "= " + v.pos_x + "," + v.pos_y + "," + v.velocidad);
             }
+
         }
 
     }

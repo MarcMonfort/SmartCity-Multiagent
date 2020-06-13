@@ -128,28 +128,32 @@ public class OntologyParser {
             calles[i].dir_y = direccion[1];
 
             //NUEVO
-            ArrayList<EntornoAgent.Semaforo> semaforos = new ArrayList<>();
+            //ArrayList<EntornoAgent.Semaforo> semaforos = new ArrayList<>();
+            ArrayList<String> nombre_semaforos = new ArrayList<>();
             NodeIterator it = indiv_calles[i].listPropertyValues(contiene);
             while (it.hasNext()) {
                 //it.asResource().getLocalName(); // nombre calle
-                EntornoAgent.Semaforo semaforo = getSemaforo(it.next().asResource().getLocalName());
-                semaforos.add(semaforo);
+                //EntornoAgent.Semaforo semaforo = getSemaforo(it.next().asResource().getLocalName());
+                nombre_semaforos.add(it.next().asResource().getLocalName());
             }
-            calles[i].semaforos = semaforos; //array list no array
+            calles[i].nombre_semaforos = nombre_semaforos; //array list no array
 
 
-            String nombreSiguiente = indiv_calles[i].getPropertyValue(tieneSiguiente).asResource().getLocalName();
-            calles[i].siguiente = getCalle(nombreSiguiente);
+            calles[i].nombre_sig = indiv_calles[i].getPropertyValue(tieneSiguiente).asResource().getLocalName();
+            //String nombreSiguiente = indiv_calles[i].getPropertyValue(tieneSiguiente).asResource().getLocalName();
+            //calles[i].siguiente = getCalle(nombreSiguiente);
 
 
-            ArrayList<EntornoAgent.Calle> intersecciones = new ArrayList<>();
+            //ArrayList<EntornoAgent.Calle> intersecciones = new ArrayList<>();
+            ArrayList<String> nombre_intersecciones = new ArrayList<>();
             it = indiv_calles[i].listPropertyValues(tieneInterseccion);
             while (it.hasNext()) {
                 //it.asResource().getLocalName(); // nombre calle
-                EntornoAgent.Calle calle_inter = getCalle(it.next().asResource().getLocalName());
-                intersecciones.add(calle_inter);
+                //EntornoAgent.Calle calle_inter = getCalle(it.next().asResource().getLocalName());
+                nombre_intersecciones.add(it.next().asResource().getLocalName());
             }
-            calles[i].inter = intersecciones; //array list no array
+            //calles[i].inter = intersecciones; //array list no array
+            calles[i].nombre_inter = nombre_intersecciones;
 
         }
         return calles;
@@ -180,6 +184,35 @@ public class OntologyParser {
         calle.fin_y = coord_fin[1];
         calle.dir_x = direccion[0];
         calle.dir_y = direccion[1];
+
+        //nuevo
+        //NUEVO
+        Property tieneSiguiente     = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#tieneSiguiente");
+        Property contiene           = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#contiene"); //semaforo
+        Property tieneInterseccion  = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#tieneInterseccion");
+        //NUEVO
+        ArrayList<EntornoAgent.Semaforo> semaforos = new ArrayList<>();
+        NodeIterator it = indiv.listPropertyValues(contiene);
+        while (it.hasNext()) {
+            //it.asResource().getLocalName(); // nombre calle
+            EntornoAgent.Semaforo semaforo = getSemaforo(it.next().asResource().getLocalName());
+            semaforos.add(semaforo);
+        }
+        calle.semaforos = semaforos; //array list no array
+
+
+        String nombreSiguiente = indiv.getPropertyValue(tieneSiguiente).asResource().getLocalName();
+        calle.siguiente = getCalle(nombreSiguiente);
+
+
+        ArrayList<EntornoAgent.Calle> intersecciones = new ArrayList<>();
+        it = indiv.listPropertyValues(tieneInterseccion);
+        while (it.hasNext()) {
+            //it.asResource().getLocalName(); // nombre calle
+            EntornoAgent.Calle calle_inter = getCalle(it.next().asResource().getLocalName());
+            intersecciones.add(calle_inter);
+        }
+        calle.inter = intersecciones; //array list no array
 
 
         return calle;

@@ -54,7 +54,21 @@ public class VehiculoAgent extends Agent {
             //llegado al destino
             if (miVehiculo.pos_x == miVehiculo.obj_x && miVehiculo.pos_y == miVehiculo.obj_y){
                 miVehiculo.velocidad = 0;
-                System.out.println(miVehiculo.nombre + "  DESTINO!!!");
+                System.out.println(miVehiculo.nombre + ": DESTINO!!!");
+                //hacer un pause(3 segundos)...
+                //miVehiculo.obj_x = -1; //poner randoms...
+                //miVehiculo.obj_y = -1; 
+                Random rand = new Random();
+                miVehiculo.obj_x = rand.nextInt(3) * 2;
+                miVehiculo.obj_y = rand.nextInt(3) * 2;
+
+                System.out.println(miVehiculo.nombre + ": Nuevo Objetivo (" + miVehiculo.obj_x +","+miVehiculo.obj_y+")");
+
+
+
+                miVehiculo.velocidad = 1;
+
+
             }
 
             //final calle
@@ -64,24 +78,44 @@ public class VehiculoAgent extends Agent {
             }
 
             // ha llegado a una intersección... decidir si cambiar o no...
-            if (miVehiculo.pos_x == calleActual.inter.get(0).ini_x && miVehiculo.pos_y == calleActual.inter.get(0).fin_x){
-                System.out.println(miVehiculo.nombre + "  Estoy en una interseccioin");
+            for (EntornoAgent.Calle calle_inter : calleActual.inter) {
+                if (((miVehiculo.pos_x - calle_inter.ini_x) * calleActual.dir_x + (miVehiculo.pos_y - calle_inter.ini_y) * calleActual.dir_y)==0) {
+                    System.out.println(miVehiculo.nombre + "  Estoy en una interseccioin");
 
-                Random rand = new Random();
-                if (rand.nextBoolean()){
-                    calleActual = calleActual.inter.get(0);
+                    Random rand = new Random();
+                    boolean cambiar = rand.nextBoolean();
+                    if (true) {
+                        calleActual = calle_inter;
+                    }
                 }
             }
 
             // ha llegado a un semaforo
-            if (miVehiculo.pos_x == calleActual.semaforos.get(0).pos_x && miVehiculo.pos_y == calleActual.semaforos.get(0).pos_y){
-                //esta en rojo
-                if (calleActual.nombre == calleActual.semaforos.get(0).calleCerrada) {
-                    System.out.println(miVehiculo.nombre + "  Esperando en semaforo");
-                    miVehiculo.velocidad = 0;
-                    // solicitar ponerse en verde,,, (messageInitiator)
-                    // esperar a que responda y se ponga en verde
-                    // (puede que no funcione, y haya que mirar del entorno...)
+            for (EntornoAgent.Semaforo semaforo : calleActual.semaforos) {
+                if ((miVehiculo.pos_x+calleActual.dir_x) == semaforo.pos_x && (miVehiculo.pos_y+calleActual.dir_y) == semaforo.pos_y){
+                    //esta en rojo
+                    if (calleActual.nombre.equals(semaforo.calleCerrada)) {
+                        System.out.println(miVehiculo.nombre + "  Esperando en semaforo");
+                        miVehiculo.velocidad = 0;
+                        // solicitar ponerse en verde,,, (messageInitiator)
+                        // esperar a que responda y se ponga en verde
+                        // (puede que no funcione, y haya que mirar del entorno...)
+
+                        myAgent.addBehaviour(new AchieveREInitiator(myAgent, request) {
+                            protected void handleInform(ACLMessage inform) {
+                                String respuesta = inform.getContent();
+                            }
+                        });
+                        // Espera a que el cloud le responda
+                        ACLMessage r = blockingReceive();
+                        String respuesta_cloud = r.getContent();
+        
+
+                    }
+                    else {
+                        miVehiculo.velocidad = 1;
+                    }
+
                 }
             }
 
@@ -116,7 +150,7 @@ public class VehiculoAgent extends Agent {
 
                     myAgent.addBehaviour(new AchieveREInitiator(myAgent, aclMessage) {
                         protected void handleInform(ACLMessage inform) {
-                            System.out.println(inform.getContent());
+                            //System.out.println(inform.getContent());
                             //double t = Double.parseDouble(inform.getContent());
                             //System.out.println(VehiculoAgent.this.getName() + " == " + inform.getContent()); //
                             
@@ -139,6 +173,7 @@ public class VehiculoAgent extends Agent {
 
         miVehiculo = (EntornoAgent.Vehiculo) args[1];
         calleActual = (EntornoAgent.Calle) args[2];
+
 
         miVehiculo.velocidad = 1;
 
