@@ -16,6 +16,7 @@ import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREResponder;
+import jade.tools.sniffer.Sniffer;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
@@ -83,9 +84,13 @@ public class EntornoAgent extends Agent {
 
         OntologyParser parser = new OntologyParser(JENA, File, NamingContext);
 
-        System.out.println("Load the Ontology");
         parser.loadOntology();
-        System.out.println("------------------");
+        System.out.println("Ontology loaded");
+
+        ContainerController cc = getContainerController();
+        AgentController sniffer = cc.createNewAgent("Sniffer", Sniffer.class.getName(), null);
+        sniffer.start();
+        System.out.println("Sniffer started");
 
         System.out.println("INSTANCIAS DE CALLES:");
         calles = parser.getCalles();
@@ -101,7 +106,6 @@ public class EntornoAgent extends Agent {
         System.out.println("INSTANCIAS DE VEHICULOS:");
         vehiculos = parser.getVehiculos();
 
-        ContainerController cc = getContainerController();
         for (int i = 0; i < vehiculos.length; i++) {
             System.out.println(vehiculos[i].nombre + ":");
             System.out.println("  Calle: " + vehiculos[i].calle_actual);
