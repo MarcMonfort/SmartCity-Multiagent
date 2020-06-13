@@ -21,6 +21,7 @@ import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -37,6 +38,11 @@ public class EntornoAgent extends Agent {
         public int fin_y;
         public int dir_x;
         public int dir_y;
+        
+        public Calle siguiente;
+        public ArrayList<Calle> inter; //null
+
+        public ArrayList<Semaforo> semaforos; //arrasy list
     }
 
     public static class Vehiculo {
@@ -103,26 +109,7 @@ public class EntornoAgent extends Agent {
 
         }
 
-        System.out.println("INSTANCIAS DE VEHICULOS:");
-        vehiculos = parser.getVehiculos();
-
-        for (int i = 0; i < vehiculos.length; i++) {
-            System.out.println(vehiculos[i].nombre + ":");
-            System.out.println("  Calle: " + vehiculos[i].calle_actual);
-            System.out.println("  Pos : " + vehiculos[i].pos_x + ", " + vehiculos[i].pos_y);
-            System.out.println("  Obj : " + vehiculos[i].obj_x + ", " + vehiculos[i].obj_y);
-            System.out.println("  Vel : " + vehiculos[i].velocidad);
-            Object[] args = new Object[3];
-
-            String nombre_calle = vehiculos[i].calle_actual;
-            int id_calle = Integer.parseInt(nombre_calle.substring(nombre_calle.length() - 1)) - 1;
-            args[0] = i; //id vehiculo... se podria obtener deel nombre...
-            args[1] = vehiculos[i];
-            args[2] = calles[id_calle];
-
-            AgentController ac = cc.createNewAgent(vehiculos[i].nombre, "org.upc.edu.Behaviours.VehiculoAgent", args);
-            ac.start();
-        }
+        
 
         System.out.println("INSTANCIAS DE SEMAFOROS:");
         semaforos = parser.getSemaforos();
@@ -151,11 +138,40 @@ public class EntornoAgent extends Agent {
             ac.start();
         }
 
+        {
         Object[] args = new Object[1];
         args[0] = semaforos;
         //args[1] = calles
         AgentController ac = cc.createNewAgent("CentroDeDatos", "org.upc.edu.Behaviours.CloudAgent", args);
         ac.start();
+        }
+
+
+        System.out.println("INSTANCIAS DE VEHICULOS:");
+        vehiculos = parser.getVehiculos();
+
+        for (Vehiculo v : vehiculos) { //relaciona calles con calles
+            //objetos con objetos
+            // si no funciona ultima solucion obtenerlo en la clase vehiculo
+        }
+
+        for (int i = 0; i < vehiculos.length; i++) {
+            System.out.println(vehiculos[i].nombre + ":");
+            System.out.println("  Calle: " + vehiculos[i].calle_actual);
+            System.out.println("  Pos : " + vehiculos[i].pos_x + ", " + vehiculos[i].pos_y);
+            System.out.println("  Obj : " + vehiculos[i].obj_x + ", " + vehiculos[i].obj_y);
+            System.out.println("  Vel : " + vehiculos[i].velocidad);
+            Object[] args = new Object[3];
+
+            String nombre_calle = vehiculos[i].calle_actual;
+            int id_calle = Integer.parseInt(nombre_calle.substring(nombre_calle.length() - 1)) - 1;
+            args[0] = i; //id vehiculo... se podria obtener deel nombre...
+            args[1] = vehiculos[i];
+            args[2] = calles[id_calle];
+
+            AgentController ac = cc.createNewAgent(vehiculos[i].nombre, "org.upc.edu.Behaviours.VehiculoAgent", args);
+            ac.start();
+        }
     }
 
     public class EntornoTickerBehaviour extends TickerBehaviour {
@@ -214,6 +230,13 @@ public class EntornoAgent extends Agent {
                 vehiculos[elID].pos_x = Integer.parseInt(contentArray[2]);
                 vehiculos[elID].pos_y = Integer.parseInt(contentArray[3]);
                 vehiculos[elID].velocidad = Integer.parseInt(contentArray[4]);
+
+                for (Vehiculo v : vehiculos){
+                    
+                }
+
+
+                // devuelve veehiculo mas cercano, y luz del semaforo
 
                 ACLMessage informDone  = request.createReply();
                 informDone.setPerformative(ACLMessage.INFORM);

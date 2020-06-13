@@ -22,6 +22,8 @@ import java.util.Date;
 import java.util.Enumeration;
 import java.util.Vector;
 
+//import static jade.lang.acl.MessageTemplate.MatchPerformative;
+
 /**
  * @author igomez
  */
@@ -39,11 +41,11 @@ public class CloudAgent extends Agent {
             System.out.println("Agent '" + propose.getSender().getName() + "' proposed '" + propose.getContent() + "'");
         }
 
-        protected void handleRefuse(ACLMessage refuse) {
+        /*protected void handleRefuse(ACLMessage refuse) {
             System.out.println("Agent '" + refuse.getSender().getName() + "' refused");
-        }
+        }*/
 
-        protected void handleFailure(ACLMessage failure) {
+        /*protected void handleFailure(ACLMessage failure) {
             if (failure.getSender().equals(myAgent.getAMS())) {
                 // FAILURE notification from the JADE runtime: the receiver
                 // does not exist
@@ -53,36 +55,39 @@ public class CloudAgent extends Agent {
             }
             // Immediate failure --> we will not receive a response from this agent
             nResponders--;
-        }
+        }*/
 
         protected void handleAllResponses(Vector responses, Vector acceptances) {
+            int nResponders = semaforos.length - 1;
+            int maxTime = 0;
+            AID bestProposer = null;
+
             if (responses.size() < nResponders) {
                 // Some responder didn't reply within the specified timeout
                 System.out.println("Timeout expired: missing " + (nResponders - responses.size()) + " responses");
             }
             // Evaluate proposals.
-            int bestProposal = -1;
-            AID bestProposer = null;
             ACLMessage accept = null;
             Enumeration e = responses.elements();
             while (e.hasMoreElements()) {
                 ACLMessage msg = (ACLMessage) e.nextElement();
-                if (msg.getPerformative() == ACLMessage.PROPOSE) {
-                    ACLMessage reply = msg.createReply();
-                    reply.setPerformative(ACLMessage.REJECT_PROPOSAL);
-                    acceptances.addElement(reply);
-                    int proposal = Integer.parseInt(msg.getContent());
-                    if (proposal > bestProposal) {
-                        bestProposal = proposal;
-                        bestProposer = msg.getSender();
-                        accept = reply;
-                    }
+                int proposal = Integer.parseInt(msg.getContent());
+                if (proposal > maxTime) {
+                    maxTime = proposal;
+                    bestProposer = msg.getSender();
                 }
+
             }
-            // Accept the proposal of the best proposer
-            if (accept != null) {
-                System.out.println("Accepting proposal '" + bestProposal + "' from responder '" + bestProposer.getName() + "'");
-                accept.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+            e = responses.elements();
+            while (e.hasMoreElements()) {
+                ACLMessage msg = (ACLMessage) e.nextElement();
+                if (msg.getPerformative() == ACLMessage.PROPOSE) {
+
+                    ACLMessage reply = msg.createReply();
+                    reply.setContent(String.valueOf(maxTime));
+                    acceptances.addElement(reply);
+                    reply.setPerformative(ACLMessage.ACCEPT_PROPOSAL);
+                }
             }
         }
 
@@ -129,19 +134,24 @@ public class CloudAgent extends Agent {
 
                 // Create the CFP message
                 ACLMessage msg = new ACLMessage(ACLMessage.CFP);
-                for (int i = 0; i < args.length; ++i) {
-                    msg.addReceiver(new AID((String) args[i], AID.ISLOCALNAME));
+                for (int i = 0; i < semaforos.length; ++i) {
+                    msg.addReceiver(new AID(semaforos[i].nombre, AID.ISLOCALNAME));
                 }
                 msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
                 // We want to receive a reply in 10 secs
+                // HACER CON MENOS TIEMPO
                 msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
-                msg.setContent("perform-AIA-exam");
+                msg.setContent("solicitud-cambio-semaforos");
                 ContractNetInitiatorBehaviour cib = new ContractNetInitiatorBehaviour(myAgent, msg);
                 addBehaviour(cib);
 
+                MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+                ACLMessage resultado = myAgent.blockingReceive(mt);
+                //while(!cib.done());
+
                 ACLMessage informDone  = request.createReply();
                 informDone.setPerformative(ACLMessage.INFORM);
-                informDone.setContent(String.valueOf(t));
+                informDone.setContent(resultado.getContent());
                 return informDone;
             }
             protected ACLMessage handleRequest(ACLMessage request) {
