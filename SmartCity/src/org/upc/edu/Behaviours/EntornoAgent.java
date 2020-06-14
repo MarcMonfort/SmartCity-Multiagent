@@ -124,7 +124,7 @@ public class EntornoAgent extends Agent {
 
             System.out.println("  Pos : " + semaforos[i].pos_x + ", " + semaforos[i].pos_y);
             System.out.println("  CalleCerrada : " + semaforos[i].calleCerrada);
-            Object[] args = new Object[4];
+            Object[] args = new Object[5];
 
             String nombre_calle1 = semaforos[i].calle1;
             String nombre_calle2 = semaforos[i].calle2;
@@ -132,11 +132,11 @@ public class EntornoAgent extends Agent {
             int id_calle1 = Integer.parseInt(nombre_calle1.substring(nombre_calle1.length() - 1)) - 1;
             int id_calle2 = Integer.parseInt(nombre_calle2.substring(nombre_calle2.length() - 1)) - 1;
 
-            args[0] = i; //id semaforo... se podria obtener deel nombre...
+            args[0] = i;
             args[1] = semaforos[i];
             args[2] = calles[id_calle1];
             args[3] = calles[id_calle2];
-
+            args[4] = semaforos[i].calleCerrada;
             AgentController ac = cc.createNewAgent(semaforos[i].nombre, "org.upc.edu.Behaviours.SemaforoAgent", args);
             ac.start();
         }
@@ -178,7 +178,7 @@ public class EntornoAgent extends Agent {
             // si no funciona ultima solucion obtenerlo en la clase vehiculo
         }
 
-        for (int i = 0; i < vehiculos.length; i++) {
+        for (int i = 1; i < 2; i++) {
             System.out.println(vehiculos[i].nombre + ":");
             System.out.println("  Calle: " + vehiculos[i].calle_actual);
             System.out.println("  Pos : " + vehiculos[i].pos_x + ", " + vehiculos[i].pos_y);

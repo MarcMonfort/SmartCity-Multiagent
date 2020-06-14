@@ -15,8 +15,10 @@ import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
 import jade.lang.acl.MessageTemplate;
+import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
 import jade.proto.ContractNetInitiator;
+import org.apache.jena.base.Sys;
 
 import java.util.Date;
 import java.util.Enumeration;
@@ -30,6 +32,8 @@ import java.util.Vector;
 public class CloudAgent extends Agent {
 
     EntornoAgent.Semaforo[] semaforos;
+    AID semaforoSender;
+    boolean respuestaPendiente;
     //EntornoAgent.Calle[] calles;
 
     private class ContractNetInitiatorBehaviour extends ContractNetInitiator {
@@ -38,7 +42,7 @@ public class CloudAgent extends Agent {
         }
 
         protected void handlePropose(ACLMessage propose, Vector v) {
-            System.out.println("Agent '" + propose.getSender().getName() + "' proposed '" + propose.getContent() + "'");
+            System.out.println("[Cloud] Agent '" + propose.getSender().getLocalName() + "' proposed '" + propose.getContent() + "'");
         }
 
         /*protected void handleRefuse(ACLMessage refuse) {
@@ -92,7 +96,25 @@ public class CloudAgent extends Agent {
         }
 
         protected void handleInform(ACLMessage inform) {
-            System.out.println("Agent '" + inform.getSender().getName() + "' successfully performed the requested action");
+            System.out.println("[Cloud] Agent '" + inform.getSender().getLocalName() + "' successfully performed the requested action");
+            if (respuestaPendiente) {
+                System.out.println("[Cloud] Agent : preparando respuesta por parte de '" + inform.getSender().getLocalName() + "'");
+                respuestaPendiente = false;
+
+                ACLMessage proposeCloud = new ACLMessage(ACLMessage.PROPOSE);
+                proposeCloud.setProtocol(FIPANames.InteractionProtocol.FIPA_PROPOSE);
+                proposeCloud.addReceiver(semaforoSender);
+                proposeCloud.setSender(myAgent.getAID());
+                proposeCloud.setContent(inform.getContent());
+                System.out.println("[Cloud] responde al semaforoSender (" + semaforoSender.getLocalName() + ") con el tiempo de espera");
+
+                myAgent.addBehaviour(new AchieveREInitiator(myAgent, proposeCloud) {
+                    protected void handleAgree(ACLMessage agree) {
+                        System.out.println("[Cloud] Ya le ha llegado la respuesta al " + agree.getSender().getLocalName() + " !!!!");
+                    }
+                });
+            }
+
         }
 
 
@@ -113,7 +135,7 @@ public class CloudAgent extends Agent {
         desc.setName(getAID());
 
         final ServiceDescription sdesc = new ServiceDescription();
-        sdesc.setName("Cloud");
+        sdesc.setName("CentroDeDatos");
         sdesc.setType("Cloud");
         desc.addServices(sdesc);
 
@@ -132,26 +154,36 @@ public class CloudAgent extends Agent {
         this.addBehaviour(new AchieveREResponder(this, mt) {
             protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {
 
+                semaforoSender = request.getSender();
                 // Create the CFP message
                 ACLMessage msg = new ACLMessage(ACLMessage.CFP);
                 for (int i = 0; i < semaforos.length; ++i) {
-                    msg.addReceiver(new AID(semaforos[i].nombre, AID.ISLOCALNAME));
+                    if (!semaforos[i].nombre.equals(semaforoSender.getLocalName())) {
+                        msg.addReceiver(new AID(semaforos[i].nombre, AID.ISLOCALNAME));
+                    }
                 }
+                //msg.removeReceiver(semaforoSender); //se envia a todos menos al sender
+
                 msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
                 // We want to receive a reply in 10 secs
                 // HACER CON MENOS TIEMPO
-                msg.setReplyByDate(new Date(System.currentTimeMillis() + 10000));
+                msg.setReplyByDate(new Date(System.currentTimeMillis() + 1000));
                 msg.setContent("solicitud-cambio-semaforos");
+
+                respuestaPendiente = true;
+                System.out.println("Cloud empieza ContractNetInitiator!!!");
                 ContractNetInitiatorBehaviour cib = new ContractNetInitiatorBehaviour(myAgent, msg);
                 addBehaviour(cib);
 
                 MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-                ACLMessage resultado = myAgent.blockingReceive(mt);
+                //ACLMessage resultado = myAgent.blockingReceive(mt);
                 //while(!cib.done());
 
+                // Responde al semaforo inicial con el resultado de contract-net
                 ACLMessage informDone  = request.createReply();
                 informDone.setPerformative(ACLMessage.INFORM);
-                informDone.setContent(resultado.getContent());
+                informDone.setContent("wait");
+
                 return informDone;
             }
             protected ACLMessage handleRequest(ACLMessage request) {

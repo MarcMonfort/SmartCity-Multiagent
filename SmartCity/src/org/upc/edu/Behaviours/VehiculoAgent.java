@@ -15,6 +15,7 @@ import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
+import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREInitiator;
 
 import java.util.Random;
@@ -33,6 +34,7 @@ public class VehiculoAgent extends Agent {
     EntornoAgent.Calle calleActual; // voy a suponer que sabe en que calle esta
     int myID;
 
+    boolean semaforoRojoConsultado; // sirve para no consultar otra vez mientras espera a que se ponga verde
 
 
     public class VehiculoTickerBehaviour extends TickerBehaviour {
@@ -94,26 +96,53 @@ public class VehiculoAgent extends Agent {
             for (EntornoAgent.Semaforo semaforo : calleActual.semaforos) {
                 if ((miVehiculo.pos_x+calleActual.dir_x) == semaforo.pos_x && (miVehiculo.pos_y+calleActual.dir_y) == semaforo.pos_y){
                     //esta en rojo
-                    if (calleActual.nombre.equals(semaforo.calleCerrada)) {
-                        System.out.println(miVehiculo.nombre + "  Esperando en semaforo");
+                    System.out.println("semaforo.calleCerrada = " + semaforo.calleCerrada);
+                    System.out.println("calleActual.nombre = " + calleActual.nombre);
+
+                    if (calleActual.nombre.equals(semaforo.calleCerrada) && !semaforoRojoConsultado) {
+                        System.out.println(miVehiculo.nombre + "  Esperando en : " + semaforo.nombre);
                         miVehiculo.velocidad = 0;
                         // solicitar ponerse en verde,,, (messageInitiator)
                         // esperar a que responda y se ponga en verde
                         // (puede que no funcione, y haya que mirar del entorno...)
 
-                        myAgent.addBehaviour(new AchieveREInitiator(myAgent, request) {
+                        DFAgentDescription search_template;
+                        ServiceDescription sd = new ServiceDescription();
+                        sd.setName(semaforo.nombre);
+                        search_template = new DFAgentDescription();
+                        search_template.addServices(sd);
+
+                        DFAgentDescription[] search_results = new DFAgentDescription[0];
+                        AID semaforoAID = null;
+                        try {
+                            search_results = DFService.search(myAgent, search_template);
+                        } catch (FIPAException ex) {
+                            System.out.println("Agente " + myAgent.getLocalName() + ": Error al buscar al semaforo");
+                        }
+                        if (search_results.length > 0) {
+                            semaforoAID = search_results[0].getName();
+                            System.out.println(myAgent.getLocalName() + " : " + semaforoAID.getLocalName() + " encontrado");
+                        }
+
+
+                        ACLMessage requestSemaforo = new ACLMessage(ACLMessage.REQUEST);
+                        requestSemaforo.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+                        requestSemaforo.addReceiver(semaforoAID);
+                        requestSemaforo.setSender(myAgent.getAID());
+
+                        myAgent.addBehaviour(new AchieveREInitiator(myAgent, requestSemaforo) {
                             protected void handleInform(ACLMessage inform) {
                                 String respuesta = inform.getContent();
+                                System.out.println("alo???");
                             }
                         });
-                        // Espera a que el cloud le responda
-                        ACLMessage r = blockingReceive();
-                        String respuesta_cloud = r.getContent();
-        
+                        semaforoRojoConsultado = true;
+                        System.out.println("ESPERANDO RESPUESTA DEL SEMAFORO");
 
-                    }
-                    else {
+                    } else {
                         miVehiculo.velocidad = 1;
+                        semaforoRojoConsultado = false;
+                        System.out.println("Vehiculo ACTIVADOOOO");
                     }
 
                 }
@@ -187,7 +216,7 @@ public class VehiculoAgent extends Agent {
         desc.setName(getAID());
 
         final ServiceDescription sdesc = new ServiceDescription();
-        sdesc.setName("Vehiculo"); //habria que poner nombre vehiculo
+        sdesc.setName(miVehiculo.nombre);
         sdesc.setType("Vehiculo");
         desc.addServices(sdesc);
 
