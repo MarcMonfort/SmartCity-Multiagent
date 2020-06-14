@@ -68,6 +68,7 @@ public class VehiculoAgent extends Agent {
 
 
             // busca vehiculo mas cercano
+            distVehiculoCarcano = miVehiculo.calleActual.longitud;
             for (EntornoAgent.Vehiculo v : miVehiculo.calleActual.vehiculos.values()) {
                 if (v != miVehiculo) {
                     //siempre misma calle
@@ -107,15 +108,13 @@ public class VehiculoAgent extends Agent {
                 if (((miVehiculo.pos_x - calle_inter.ini_x) * miVehiculo.calleActual.dir_x + (miVehiculo.pos_y - calle_inter.ini_y) * miVehiculo.calleActual.dir_y)==0) {
                     System.out.println(miVehiculo.nombre + "  Estoy en una interseccioin");
 
-                    //Random rand = new Random();
-                    //boolean cambiar = rand.nextBoolean();
 
                     boolean cambiar = (calle_inter.ini_x - miVehiculo.obj_x) * calle_inter.dir_y + (calle_inter.ini_y - miVehiculo.obj_y) * calle_inter.dir_x == 0;
                     
-                    if (!cambiar){
+                    /* if (!cambiar){
                         Random rand = new Random();
                         cambiar = rand.nextBoolean();
-                    }
+                    } */
 
                     if (cambiar) {
                         miVehiculo.calleActual.vehiculos.remove(miVehiculo.nombre);
@@ -169,10 +168,12 @@ public class VehiculoAgent extends Agent {
 
                     } 
                     // verde 
-                    else if (!miVehiculo.calleActual.nombre.equals(semaforo.calleCerrada) && miVehiculo.velocidad == 0 && distVehiculoCarcano > 1) {
-                        miVehiculo.velocidad = 1;
+                    else if (!miVehiculo.calleActual.nombre.equals(semaforo.calleCerrada)) {
                         semaforoRojoConsultado = false;
-                        System.out.println(myAgent.getLocalName() +" ACTIVADO");
+                        if (miVehiculo.velocidad == 0 && distVehiculoCarcano > 1){
+                            miVehiculo.velocidad = 1;
+                            System.out.println(myAgent.getLocalName() +" ACTIVADO");
+                        }
                     }
                 }
             }
