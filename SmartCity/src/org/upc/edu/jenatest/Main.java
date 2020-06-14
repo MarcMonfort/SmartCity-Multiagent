@@ -54,7 +54,7 @@ public class Main {
 
         for (int i = 0; i < vehiculos.length; i++) {
             System.out.println(vehiculos[i].nombre + ":");
-            System.out.println("  Calle: " + vehiculos[i].calle_actual);
+            System.out.println("  Calle: " + vehiculos[i].calleActual.nombre);
             System.out.println("  Pos : " + vehiculos[i].pos_x + ", " + vehiculos[i].pos_y);
             System.out.println("  Obj : " + vehiculos[i].obj_x + ", " + vehiculos[i].obj_y);
             System.out.println("  Vel : " + vehiculos[i].velocidad);

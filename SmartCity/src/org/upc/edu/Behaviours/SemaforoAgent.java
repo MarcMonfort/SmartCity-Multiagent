@@ -26,15 +26,69 @@ import org.apache.jena.base.Sys;
 public class SemaforoAgent extends Agent {
 
     EntornoAgent.Semaforo miSemaforo;
-    EntornoAgent.Calle calle1;
-    EntornoAgent.Calle calle2;
-    String calleAbierta;
-    String calleCerrada;
-    int tiempoEstadoActual = 0;
 
     int myID;
 
     AID cloudAID;
+
+    public int getTiempoEspera() {
+        int proposedWaitingTime;
+
+        if (miSemaforo.tiempoEstadoActual >= 10) {
+            proposedWaitingTime = 0;
+        }
+        else {
+            proposedWaitingTime = 10 - miSemaforo.tiempoEstadoActual;
+        }
+
+        EntornoAgent.Calle cC, cA;
+        if (miSemaforo.calleCerrada.equals(miSemaforo.calle1.nombre))  {
+            cC = miSemaforo.calle1;
+            cA = miSemaforo.calle2;
+        }
+        else {
+            cC = miSemaforo.calle2;
+            cA = miSemaforo.calle1;
+        }
+
+        // Rango de calle donde mirar coches (entre inicio de la calle y semaforo)
+        int ini_x = cA.ini_x;
+        int ini_y = cA.ini_y;
+        
+        int fin_x = miSemaforo.pos_x;
+        int fin_y = miSemaforo.pos_y;
+        
+        if ( (cA.dir_x == -1 && ini_x > fin_x) || (cA.dir_y == -1 && ini_y > fin_y) ){
+            int aux_x = ini_x;
+            int aux_y = ini_y;
+            ini_x = fin_x;
+            ini_y = fin_y;
+            fin_x = aux_x;
+            fin_y = aux_y;
+        }
+
+        System.out.println(miSemaforo.nombre + " cA = " + cA.nombre);
+        for (EntornoAgent.Vehiculo v : cA.vehiculos.values()){
+            if (v.pos_x >= ini_x && v.pos_y >= ini_y &&  v.pos_x <= fin_x && v.pos_y <= fin_y) {
+                proposedWaitingTime++;
+                System.out.println("    +1 => " + v.nombre);
+            }
+        }
+
+
+        fin_x = cC.ini_x;
+        fin_y = cC.ini_y;
+
+        System.out.println(miSemaforo.nombre + " cC = " + cC.nombre);
+        for (EntornoAgent.Vehiculo v : cC.vehiculos.values()){
+            if (v.pos_x >= ini_x && v.pos_y >= ini_y &&  v.pos_x <= fin_x && v.pos_y <= fin_y) {
+                proposedWaitingTime--;
+                System.out.println("    -1 => " + v.nombre);
+            }
+        }
+
+        return proposedWaitingTime;
+    }
 
 
     private boolean calleAbiertaVacia() {
@@ -50,19 +104,13 @@ public class SemaforoAgent extends Agent {
         }
 
         protected ACLMessage handleCfp(ACLMessage cfp) throws NotUnderstoodException, RefuseException {
-            System.out.println("Agent '" + getLocalName() + "' receives a CFP from Agent '" + cfp.getSender().getLocalName() + "' to perform action '" + cfp.getContent() + "'");
-            //getDatosSemaforo();
+            //System.out.println("Agent '" + getLocalName() + "' receives a CFP from Agent '" + cfp.getSender().getLocalName() + "' to perform action '" + cfp.getContent() + "'");
 
-            int proposedWaitingTime;
             ACLMessage propose = cfp.createReply();
             propose.setPerformative(ACLMessage.PROPOSE);
             // We provide a proposal
-            if (miSemaforo.tiempoEstadoActual >= 10) {
-                proposedWaitingTime = 0;
-            }
-            else {
-                proposedWaitingTime = 10 - miSemaforo.tiempoEstadoActual;
-            }
+            int proposedWaitingTime = getTiempoEspera();
+            
             System.out.println("Agent '" + getLocalName() + "' proposes  '" + proposedWaitingTime + "'");
             propose.setContent(String.valueOf(proposedWaitingTime));
             return propose;
@@ -72,10 +120,10 @@ public class SemaforoAgent extends Agent {
         // aqui invocar al waker (si tiempo > 0, sino cambia directamente de calle)
         protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) throws FailureException {
             int countdown = Integer.parseInt(accept.getContent());
-            System.out.println("Agent '" + getLocalName() + "' accepts proposal and is about to perform an action");
+            //System.out.println("Agent '" + getLocalName() + "' accepts proposal and is about to perform an action");
             SemaforoWakerBehaviour b = new SemaforoWakerBehaviour(myAgent, countdown*1000);
             myAgent.addBehaviour(b);
-            System.out.println("Agent '" + getLocalName() + "' : invocado waker, con tiempo '" + countdown + "'");
+            System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "'");
             ACLMessage inform = accept.createReply();
             inform.setPerformative(ACLMessage.INFORM);
             inform.setContent(String.valueOf(countdown));
@@ -94,7 +142,7 @@ public class SemaforoAgent extends Agent {
         }
 
         public void onStart() {
-            System.out.println("Agent " + myAgent.getLocalName() + " with SemaforoWakerBehaviour in action!!");
+            //System.out.println("Agent " + myAgent.getLocalName() + " with SemaforoWakerBehaviour in action!!");
         }
 
         public int onEnd() {
@@ -107,8 +155,8 @@ public class SemaforoAgent extends Agent {
         }
 
         public void onWake() {
-            if (miSemaforo.calleCerrada == miSemaforo.calle1) miSemaforo.calleCerrada = miSemaforo.calle2;
-            else miSemaforo.calleCerrada = miSemaforo.calle1;
+            if (miSemaforo.calleCerrada.equals(miSemaforo.calle1.nombre)) miSemaforo.calleCerrada = miSemaforo.calle2.nombre;
+            else miSemaforo.calleCerrada = miSemaforo.calle1.nombre;
             miSemaforo.tiempoEstadoActual = 0;
         }
 
@@ -149,12 +197,13 @@ public class SemaforoAgent extends Agent {
         myID = (Integer) args[0];
 
         miSemaforo = (EntornoAgent.Semaforo) args[1];
-        calle1 = (EntornoAgent.Calle) args[2];
-        calle2 = (EntornoAgent.Calle) args[3];
+        //calle1 = (EntornoAgent.Calle) args[2];
+        //calle2 = (EntornoAgent.Calle) args[3];
         //calleCerrada = (String) args[4];
         //if (calleCerrada.equals(calle1.nombre)) calleAbierta = calle2.nombre;
         //else calleAbierta = calle1.nombre;
         //
+
 
         System.out.println("Agent " + this.getLocalName() + " inicial:\n"
                 + "   CalleCerrada : " + miSemaforo.calleCerrada);
@@ -205,10 +254,10 @@ public class SemaforoAgent extends Agent {
 
             protected ACLMessage handleRequest(ACLMessage propose) {
                 int countdown = Integer.parseInt(propose.getContent());
-                System.out.println("Agent '" + getLocalName() + "' recibió countdown del cloud... va a invocar a waker");
+                //System.out.println("Agent '" + getLocalName() + "' recibió countdown del cloud... va a invocar a waker");
                 SemaforoWakerBehaviour b = new SemaforoWakerBehaviour(myAgent, countdown*1000);
                 myAgent.addBehaviour(b);
-                System.out.println("Agent '" + getLocalName() + "' : invocado waker, con tiempo '" + countdown + "'");
+                System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "'");
 
                 ACLMessage informDone  = propose.createReply();
                 informDone.setPerformative(ACLMessage.AGREE);
@@ -229,7 +278,9 @@ public class SemaforoAgent extends Agent {
                 requestCloud.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
                 requestCloud.addReceiver(cloudAID);
                 requestCloud.setSender(myAgent.getAID());
-                System.out.println("Agent " + myAgent.getLocalName() + "va a llamar a Cloud...");
+                int miTiempo = getTiempoEspera();
+                requestCloud.setContent(String.valueOf(miTiempo));
+                System.out.println("Agent " + myAgent.getLocalName() + "va a llamar a Cloud con tiempo: " + miTiempo);
 
                 // Pregunta al cloud para que negocie con los otros semaforos
                 myAgent.addBehaviour(new AchieveREInitiator(myAgent, requestCloud) {

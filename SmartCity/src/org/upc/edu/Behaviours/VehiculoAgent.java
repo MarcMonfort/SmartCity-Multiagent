@@ -28,10 +28,10 @@ public class VehiculoAgent extends Agent {
 
     String vID;
 
-    int dist_next_obstacle;
+    int distVehiculoCarcano;
 
     EntornoAgent.Vehiculo miVehiculo;
-    EntornoAgent.Calle calleActual; // voy a suponer que sabe en que calle esta
+    //EntornoAgent.Calle miVehiculo.calleActual; // voy a suponer que sabe en que calle esta
     int myID;
 
     boolean semaforoRojoConsultado; // sirve para no consultar otra vez mientras espera a que se ponga verde
@@ -47,122 +47,145 @@ public class VehiculoAgent extends Agent {
 
 
         public void onTick() {
-            // mirar si se llega al final del carril
-            boolean fin_calle = false;
 
-            miVehiculo.pos_x += miVehiculo.velocidad * calleActual.dir_x;
-            miVehiculo.pos_y += miVehiculo.velocidad * calleActual.dir_y;
+            miVehiculo.pos_x += miVehiculo.velocidad * miVehiculo.calleActual.dir_x;
+            miVehiculo.pos_y += miVehiculo.velocidad * miVehiculo.calleActual.dir_y;
 
             //llegado al destino
             if (miVehiculo.pos_x == miVehiculo.obj_x && miVehiculo.pos_y == miVehiculo.obj_y){
-                miVehiculo.velocidad = 0;
+                //miVehiculo.velocidad = 0;
                 System.out.println(miVehiculo.nombre + ": DESTINO!!!");
                 //hacer un pause(3 segundos)...
-                //miVehiculo.obj_x = -1; //poner randoms...
-                //miVehiculo.obj_y = -1; 
+                // nuevo objetivo
                 Random rand = new Random();
-                miVehiculo.obj_x = rand.nextInt(3) * 2;
-                miVehiculo.obj_y = rand.nextInt(3) * 2;
+                miVehiculo.obj_x = rand.nextInt(3) * 5;
+                miVehiculo.obj_y = rand.nextInt(3) * 5;
 
                 System.out.println(miVehiculo.nombre + ": Nuevo Objetivo (" + miVehiculo.obj_x +","+miVehiculo.obj_y+")");
 
-
-
-                miVehiculo.velocidad = 1;
-
-
+                //miVehiculo.velocidad = 1;
             }
+
+
+            // busca vehiculo mas cercano
+            for (EntornoAgent.Vehiculo v : miVehiculo.calleActual.vehiculos.values()) {
+                if (v != miVehiculo) {
+                    //siempre misma calle
+                    int dist = (v.pos_x - miVehiculo.pos_x) + (v.pos_y - miVehiculo.pos_y);
+                    dist = dist * (miVehiculo.calleActual.dir_x + miVehiculo.calleActual.dir_y);
+                    if ( dist >= 0 && dist < distVehiculoCarcano ){
+                        distVehiculoCarcano = dist;
+                    }
+                }
+            }
+            if (distVehiculoCarcano == 1) { // tanto si es otro vehiculo
+                System.out.println(miVehiculo.nombre + "  va a chocar...");
+                miVehiculo.velocidad = 0;
+                // esperas o envias mensaje
+            }
+            else if (distVehiculoCarcano == 0) {
+                System.out.println(miVehiculo.nombre + "  ACCIDENTE!!!");
+                miVehiculo.velocidad = 0;
+            }
+            else {
+                miVehiculo.velocidad = 1;
+            }
+
 
             //final calle
-            if (miVehiculo.pos_x == calleActual.fin_x && miVehiculo.pos_y == calleActual.fin_y){
+            if (miVehiculo.pos_x == miVehiculo.calleActual.fin_x && miVehiculo.pos_y == miVehiculo.calleActual.fin_y){
                 System.out.println(miVehiculo.nombre + "  Ha llegado al final de la calle");
-                calleActual = calleActual.siguiente;
+
+                miVehiculo.calleActual.vehiculos.remove(miVehiculo.nombre);
+                miVehiculo.calleActual = miVehiculo.calleActual.siguiente;
+                miVehiculo.calleActual.vehiculos.put(miVehiculo.nombre, miVehiculo);
+
             }
 
-            // ha llegado a una intersección... decidir si cambiar o no...
-            for (EntornoAgent.Calle calle_inter : calleActual.inter) {
-                if (((miVehiculo.pos_x - calle_inter.ini_x) * calleActual.dir_x + (miVehiculo.pos_y - calle_inter.ini_y) * calleActual.dir_y)==0) {
+            // ha llegado a una intersección... decidir si cambiar o no... si su destino esta en la nueva calle, cambia a esa calle!
+            for (EntornoAgent.Calle calle_inter : miVehiculo.calleActual.inter) {
+                if (((miVehiculo.pos_x - calle_inter.ini_x) * miVehiculo.calleActual.dir_x + (miVehiculo.pos_y - calle_inter.ini_y) * miVehiculo.calleActual.dir_y)==0) {
                     System.out.println(miVehiculo.nombre + "  Estoy en una interseccioin");
 
-                    Random rand = new Random();
-                    boolean cambiar = rand.nextBoolean();
-                    if (true) {
-                        calleActual = calle_inter;
+                    //Random rand = new Random();
+                    //boolean cambiar = rand.nextBoolean();
+
+                    boolean cambiar = (calle_inter.ini_x - miVehiculo.obj_x) * calle_inter.dir_y + (calle_inter.ini_y - miVehiculo.obj_y) * calle_inter.dir_x == 0;
+                    
+                    if (!cambiar){
+                        Random rand = new Random();
+                        cambiar = rand.nextBoolean();
+                    }
+
+                    if (cambiar) {
+                        miVehiculo.calleActual.vehiculos.remove(miVehiculo.nombre);
+                        miVehiculo.calleActual = calle_inter;
+                        miVehiculo.calleActual.vehiculos.put(miVehiculo.nombre, miVehiculo);
                     }
                 }
             }
 
             // ha llegado a un semaforo
-            for (EntornoAgent.Semaforo semaforo : calleActual.semaforos) {
-                if ((miVehiculo.pos_x+calleActual.dir_x) == semaforo.pos_x && (miVehiculo.pos_y+calleActual.dir_y) == semaforo.pos_y){
+            for (EntornoAgent.Semaforo semaforo : miVehiculo.calleActual.semaforos) {
+                if ((miVehiculo.pos_x+miVehiculo.calleActual.dir_x) == semaforo.pos_x && (miVehiculo.pos_y+miVehiculo.calleActual.dir_y) == semaforo.pos_y){
                     //esta en rojo
-                    System.out.println("semaforo.calleCerrada = " + semaforo.calleCerrada);
-                    System.out.println("calleActual.nombre = " + calleActual.nombre);
-
-                    if (calleActual.nombre.equals(semaforo.calleCerrada) && !semaforoRojoConsultado) {
-                        System.out.println(miVehiculo.nombre + "  Esperando en : " + semaforo.nombre);
+                    if (miVehiculo.calleActual.nombre.equals(semaforo.calleCerrada)) {
                         miVehiculo.velocidad = 0;
-                        // solicitar ponerse en verde,,, (messageInitiator)
-                        // esperar a que responda y se ponga en verde
-                        // (puede que no funcione, y haya que mirar del entorno...)
+                        if (!semaforoRojoConsultado) {
+                            System.out.println(miVehiculo.nombre + "  Esperando en : " + semaforo.nombre);
 
-                        DFAgentDescription search_template;
-                        ServiceDescription sd = new ServiceDescription();
-                        sd.setName(semaforo.nombre);
-                        search_template = new DFAgentDescription();
-                        search_template.addServices(sd);
+                            DFAgentDescription search_template;
+                            ServiceDescription sd = new ServiceDescription();
+                            sd.setName(semaforo.nombre);
+                            search_template = new DFAgentDescription();
+                            search_template.addServices(sd);
 
-                        DFAgentDescription[] search_results = new DFAgentDescription[0];
-                        AID semaforoAID = null;
-                        try {
-                            search_results = DFService.search(myAgent, search_template);
-                        } catch (FIPAException ex) {
-                            System.out.println("Agente " + myAgent.getLocalName() + ": Error al buscar al semaforo");
-                        }
-                        if (search_results.length > 0) {
-                            semaforoAID = search_results[0].getName();
-                            System.out.println(myAgent.getLocalName() + " : " + semaforoAID.getLocalName() + " encontrado");
-                        }
-
-
-                        ACLMessage requestSemaforo = new ACLMessage(ACLMessage.REQUEST);
-                        requestSemaforo.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
-                        requestSemaforo.addReceiver(semaforoAID);
-                        requestSemaforo.setSender(myAgent.getAID());
-
-                        myAgent.addBehaviour(new AchieveREInitiator(myAgent, requestSemaforo) {
-                            protected void handleInform(ACLMessage inform) {
-                                String respuesta = inform.getContent();
-                                System.out.println("alo???");
+                            DFAgentDescription[] search_results = new DFAgentDescription[0];
+                            AID semaforoAID = null;
+                            try {
+                                search_results = DFService.search(myAgent, search_template);
+                            } catch (FIPAException ex) {
+                                System.out.println("Agente " + myAgent.getLocalName() + ": Error al buscar al semaforo");
                             }
-                        });
-                        semaforoRojoConsultado = true;
-                        System.out.println("ESPERANDO RESPUESTA DEL SEMAFORO");
+                            if (search_results.length > 0) {
+                                semaforoAID = search_results[0].getName();
+                                //System.out.println(myAgent.getLocalName() + " : " + semaforoAID.getLocalName() + " encontrado");
+                            }
 
-                    } else {
+
+                            ACLMessage requestSemaforo = new ACLMessage(ACLMessage.REQUEST);
+                            requestSemaforo.setProtocol(FIPANames.InteractionProtocol.FIPA_REQUEST);
+                            requestSemaforo.addReceiver(semaforoAID);
+                            requestSemaforo.setSender(myAgent.getAID());
+
+                            myAgent.addBehaviour(new AchieveREInitiator(myAgent, requestSemaforo) {
+                                protected void handleInform(ACLMessage inform) {
+                                    String respuesta = inform.getContent();
+                                }
+                            });
+                            semaforoRojoConsultado = true;
+                            System.out.println(myAgent.getLocalName() + ": ESPERANDO RESPUESTA DEL SEMAFORO");
+                        }
+
+                    } 
+                    // verde 
+                    else if (!miVehiculo.calleActual.nombre.equals(semaforo.calleCerrada) && miVehiculo.velocidad == 0 && distVehiculoCarcano > 1) {
                         miVehiculo.velocidad = 1;
                         semaforoRojoConsultado = false;
-                        System.out.println("Vehiculo ACTIVADOOOO");
+                        System.out.println(myAgent.getLocalName() +" ACTIVADO");
                     }
-
                 }
             }
 
             
 
-            if (dist_next_obstacle == 0) { // tanto si es otro vehiculo o un semaforo rojo
-                System.out.println(miVehiculo.nombre + "  va a chocar...");
-                miVehiculo.velocidad = 0;
-                // esperas o envias mensaje
-            }
-            else {
-                --dist_next_obstacle; // reducimos distancia al objeto mas cercano
-            }
-
             
 
+
+
+
             // Establece posicion y recibe next obstacle en cada tick
-            if (true) {
+            /* if (true) {
                 final DFAgentDescription desc = new DFAgentDescription();
                 final ServiceDescription sdesc = new ServiceDescription();
                 sdesc.setType("Entorno");
@@ -189,7 +212,7 @@ public class VehiculoAgent extends Agent {
                 } catch (FIPAException e) {
                     e.printStackTrace();
                 }
-            }
+            } */
 
         }
 
@@ -201,13 +224,21 @@ public class VehiculoAgent extends Agent {
         myID = (Integer) args[0];
 
         miVehiculo = (EntornoAgent.Vehiculo) args[1];
-        calleActual = (EntornoAgent.Calle) args[2];
-
 
         miVehiculo.velocidad = 1;
-
         
-        dist_next_obstacle = -1;
+        //buscamos distancia al vehiculo mas cercano de la misma calle
+        distVehiculoCarcano = miVehiculo.calleActual.longitud;
+        for (EntornoAgent.Vehiculo v : miVehiculo.calleActual.vehiculos.values()) {
+            if (v != miVehiculo) {
+                //siempre misma calle
+                int dist = (v.pos_x - miVehiculo.pos_x) + (v.pos_y - miVehiculo.pos_y);
+                dist = dist * (miVehiculo.calleActual.dir_x + miVehiculo.calleActual.dir_y);
+                if ( dist >= 0 && dist < distVehiculoCarcano ){
+                    distVehiculoCarcano = dist;
+                }
+            }
+        }
 
 
 
@@ -228,7 +259,7 @@ public class VehiculoAgent extends Agent {
         // FIN REGISTRO DF
         System.out.println("agente : " + this.getLocalName() + " registrado!!!");
 
-        VehiculoTickerBehaviour b = new VehiculoTickerBehaviour(this, 3000);
+        VehiculoTickerBehaviour b = new VehiculoTickerBehaviour(this, 1000);
         this.addBehaviour(b);
     }
 }

@@ -54,15 +54,25 @@ public class OntologyParser {
             semaforos[i].pos_y = pos[1];
 
             NodeIterator it = indiv_semaforos[i].listPropertyValues(ocurreEn);
-            semaforos[i].calle1 = it.next().asResource().getLocalName();
-            semaforos[i].calle2 = it.next().asResource().getLocalName();
+
+            EntornoAgent.Calle calle1 = new EntornoAgent.Calle();
+            EntornoAgent.Calle calle2 = new EntornoAgent.Calle();
+
+            calle1.nombre = it.next().asResource().getLocalName();
+            calle2.nombre = it.next().asResource().getLocalName();
+
+            semaforos[i].calle1 = calle1;
+            semaforos[i].calle2 = calle2;
+
+            //semaforos[i].calle1 = it.next().asResource().getLocalName();
+            //semaforos[i].calle2 = it.next().asResource().getLocalName();
 
             semaforos[i].calleCerrada = indiv_semaforos[i].getPropertyValue(cierraPasoA).asResource().getLocalName();
         }
         return semaforos;
     }
 
-    public EntornoAgent.Semaforo getSemaforo(String nombre) {
+    /* public EntornoAgent.Semaforo getSemaforo(String nombre) {
         Individual indiv;
 
         String url = "http://www.semanticweb.org/sid/smartCity#" + nombre;
@@ -86,7 +96,7 @@ public class OntologyParser {
 
         semaforo.calleCerrada = indiv.getPropertyValue(cierraPasoA).asResource().getLocalName();
         return semaforo;
-    }
+    } */
 
 
 
@@ -128,96 +138,33 @@ public class OntologyParser {
             calles[i].dir_y = direccion[1];
 
             //NUEVO
-            //ArrayList<EntornoAgent.Semaforo> semaforos = new ArrayList<>();
-            ArrayList<String> nombre_semaforos = new ArrayList<>();
+            ArrayList<EntornoAgent.Semaforo> semaforos = new ArrayList<>();
             NodeIterator it = indiv_calles[i].listPropertyValues(contiene);
             while (it.hasNext()) {
-                //it.asResource().getLocalName(); // nombre calle
-                //EntornoAgent.Semaforo semaforo = getSemaforo(it.next().asResource().getLocalName());
-                nombre_semaforos.add(it.next().asResource().getLocalName());
+                EntornoAgent.Semaforo semaforo = new EntornoAgent.Semaforo();
+                semaforo.nombre = it.next().asResource().getLocalName();
+                semaforos.add(semaforo);
             }
-            calles[i].nombre_semaforos = nombre_semaforos; //array list no array
+            calles[i].semaforos = semaforos;
 
 
-            calles[i].nombre_sig = indiv_calles[i].getPropertyValue(tieneSiguiente).asResource().getLocalName();
-            //String nombreSiguiente = indiv_calles[i].getPropertyValue(tieneSiguiente).asResource().getLocalName();
-            //calles[i].siguiente = getCalle(nombreSiguiente);
+            EntornoAgent.Calle siguiente = new EntornoAgent.Calle();
+            siguiente.nombre = indiv_calles[i].getPropertyValue(tieneSiguiente).asResource().getLocalName();
+            calles[i].siguiente = siguiente;
 
 
-            //ArrayList<EntornoAgent.Calle> intersecciones = new ArrayList<>();
-            ArrayList<String> nombre_intersecciones = new ArrayList<>();
+            ArrayList<EntornoAgent.Calle> intersecciones = new ArrayList<>();
             it = indiv_calles[i].listPropertyValues(tieneInterseccion);
             while (it.hasNext()) {
-                //it.asResource().getLocalName(); // nombre calle
-                //EntornoAgent.Calle calle_inter = getCalle(it.next().asResource().getLocalName());
-                nombre_intersecciones.add(it.next().asResource().getLocalName());
+                EntornoAgent.Calle interseccion = new EntornoAgent.Calle();
+                interseccion.nombre = it.next().asResource().getLocalName();
+                intersecciones.add(interseccion);
             }
-            //calles[i].inter = intersecciones; //array list no array
-            calles[i].nombre_inter = nombre_intersecciones;
+            calles[i].inter = intersecciones;
 
         }
         return calles;
     }
-
-
-    public EntornoAgent.Calle getCalle(String name_calle) {
-        EntornoAgent.Calle calle;
-        Individual indiv;
-        String url = "http://www.semanticweb.org/sid/smartCity#" + name_calle;
-        indiv = model.getIndividual(url);
-
-        Property tieneLongitud    = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tieneLongitud");
-        Property tienePosicionIni = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tienePosicionIni");
-        Property tienePosicionFin = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tienePosicionFin");
-        Property tieneDireccion   = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tieneDireccion");
-
-        int[] coord_ini = EntornoAgent.getCoord(indiv.getPropertyValue(tienePosicionIni).asLiteral().getString());
-        int[] coord_fin = EntornoAgent.getCoord(indiv.getPropertyValue(tienePosicionFin).asLiteral().getString());
-        int[] direccion = EntornoAgent.getCoord(indiv.getPropertyValue(tieneDireccion).asLiteral().getString());
-
-        calle = new EntornoAgent.Calle();
-        calle.nombre = indiv.getLocalName();
-        calle.longitud = indiv.getPropertyValue(tieneLongitud).asLiteral().getInt();
-        calle.ini_x = coord_ini[0];
-        calle.ini_y = coord_ini[1];
-        calle.fin_x = coord_fin[0];
-        calle.fin_y = coord_fin[1];
-        calle.dir_x = direccion[0];
-        calle.dir_y = direccion[1];
-
-        //nuevo
-        //NUEVO
-        Property tieneSiguiente     = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#tieneSiguiente");
-        Property contiene           = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#contiene"); //semaforo
-        Property tieneInterseccion  = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#tieneInterseccion");
-        //NUEVO
-        ArrayList<EntornoAgent.Semaforo> semaforos = new ArrayList<>();
-        NodeIterator it = indiv.listPropertyValues(contiene);
-        while (it.hasNext()) {
-            //it.asResource().getLocalName(); // nombre calle
-            EntornoAgent.Semaforo semaforo = getSemaforo(it.next().asResource().getLocalName());
-            semaforos.add(semaforo);
-        }
-        calle.semaforos = semaforos; //array list no array
-
-
-        String nombreSiguiente = indiv.getPropertyValue(tieneSiguiente).asResource().getLocalName();
-        calle.siguiente = getCalle(nombreSiguiente);
-
-
-        ArrayList<EntornoAgent.Calle> intersecciones = new ArrayList<>();
-        it = indiv.listPropertyValues(tieneInterseccion);
-        while (it.hasNext()) {
-            //it.asResource().getLocalName(); // nombre calle
-            EntornoAgent.Calle calle_inter = getCalle(it.next().asResource().getLocalName());
-            intersecciones.add(calle_inter);
-        }
-        calle.inter = intersecciones; //array list no array
-
-
-        return calle;
-    }
-
 
 
     public EntornoAgent.Vehiculo[] getVehiculos() {
@@ -238,12 +185,16 @@ public class OntologyParser {
             int[] obj = EntornoAgent.getCoord(indiv_vehiculos[i].getPropertyValue(tieneObjetivo).asLiteral().getString());
 
             vehiculos[i].nombre = indiv_vehiculos[i].getLocalName();
-            vehiculos[i].calle_actual = indiv_vehiculos[i].getPropertyValue(ocurreEn).asResource().getLocalName();
             vehiculos[i].velocidad = indiv_vehiculos[i].getPropertyValue(tieneVelocidad).asLiteral().getInt();
             vehiculos[i].pos_x = pos[0];
             vehiculos[i].pos_y = pos[1];
             vehiculos[i].obj_x = obj[0];
             vehiculos[i].obj_y = obj[1];
+
+            EntornoAgent.Calle calleActual = new EntornoAgent.Calle();
+            calleActual.nombre = indiv_vehiculos[i].getPropertyValue(ocurreEn).asResource().getLocalName();
+            vehiculos[i].calleActual = calleActual;
+            //vehiculos[i].calle_actual = indiv_vehiculos[i].getPropertyValue(ocurreEn).asResource().getLocalName();
         }
         return vehiculos;
     }
