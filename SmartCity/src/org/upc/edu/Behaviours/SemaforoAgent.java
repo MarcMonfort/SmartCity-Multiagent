@@ -52,41 +52,79 @@ public class SemaforoAgent extends Agent {
         }
 
         // Rango de calle donde mirar coches (entre inicio de la calle y semaforo)
-        int ini_x = cA.ini_x;
-        int ini_y = cA.ini_y;
+        int ini_x;
+        int ini_y;
+        int fin_x;
+        int fin_y;
         
-        int fin_x = miSemaforo.pos_x;
-        int fin_y = miSemaforo.pos_y;
-        
-        if ( (cA.dir_x == -1 && ini_x > fin_x) || (cA.dir_y == -1 && ini_y > fin_y) ){
-            int aux_x = ini_x;
-            int aux_y = ini_y;
-            ini_x = fin_x;
-            ini_y = fin_y;
-            fin_x = aux_x;
-            fin_y = aux_y;
+        if (cA.dir_x == 1){
+            fin_x = miSemaforo.pos_x;
+            fin_y = miSemaforo.pos_y;
+            ini_x = fin_x - cA.longitud/2;
+            ini_y = cA.ini_y;
+        }
+        else if (cA.dir_y == 1) {
+            fin_x = miSemaforo.pos_x;
+            fin_y = miSemaforo.pos_y;
+            ini_x = cA.ini_x;
+            ini_y = fin_y - cA.longitud/2;
+        }
+        else if (cA.dir_x == -1){
+            ini_x = miSemaforo.pos_x;
+            ini_y = miSemaforo.pos_y;
+            fin_x = ini_x + cA.longitud/2;
+            fin_y = cA.ini_y;
+        }
+        else { // (cA.dir_y == -1)
+            ini_x = miSemaforo.pos_x;
+            ini_y = miSemaforo.pos_y;
+            fin_x = cA.ini_x;
+            fin_y = ini_y + cA.longitud/2;
         }
 
         System.out.println(miSemaforo.nombre + " cA = " + cA.nombre);
         for (EntornoAgent.Vehiculo v : cA.vehiculos.values()){
             if (v.pos_x >= ini_x && v.pos_y >= ini_y &&  v.pos_x <= fin_x && v.pos_y <= fin_y) {
                 proposedWaitingTime++;
-                System.out.println("    +1 => " + v.nombre);
+                System.out.println(miSemaforo.nombre + " cA   " + "    +1 => " + v.nombre);
             }
         }
 
 
-        fin_x = cC.ini_x;
-        fin_y = cC.ini_y;
+        if (cC.dir_x == 1){
+            fin_x = miSemaforo.pos_x;
+            fin_y = miSemaforo.pos_y;
+            ini_x = fin_x - cC.longitud/2;
+            ini_y = cC.ini_y;
+        }
+        else if (cC.dir_y == 1) {
+            fin_x = miSemaforo.pos_x;
+            fin_y = miSemaforo.pos_y;
+            ini_x = cC.ini_x;
+            ini_y = fin_y - cC.longitud/2;
+        }
+        else if (cC.dir_x == -1){
+            ini_x = miSemaforo.pos_x;
+            ini_y = miSemaforo.pos_y;
+            fin_x = ini_x + cC.longitud/2;
+            fin_y = cC.ini_y;
+        }
+        else { // (cC.dir_y == -1)
+            ini_x = miSemaforo.pos_x;
+            ini_y = miSemaforo.pos_y;
+            fin_x = cC.ini_x;
+            fin_y = ini_y + cC.longitud/2;
+        }
 
         System.out.println(miSemaforo.nombre + " cC = " + cC.nombre);
         for (EntornoAgent.Vehiculo v : cC.vehiculos.values()){
             if (v.pos_x >= ini_x && v.pos_y >= ini_y &&  v.pos_x <= fin_x && v.pos_y <= fin_y) {
                 proposedWaitingTime--;
-                System.out.println("    -1 => " + v.nombre);
+                System.out.println(miSemaforo.nombre + " cC   " + "    -1 => " + v.nombre);
             }
         }
 
+        //if (proposedWaitingTime < 0) proposedWaitingTime = 0;
         return proposedWaitingTime;
     }
 
