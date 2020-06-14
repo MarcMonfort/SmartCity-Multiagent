@@ -66,6 +66,7 @@ public class EntornoAgent extends Agent {
         public String calle1;
         public String calle2;
         public String calleCerrada; //calle1 o calle2
+        public int tiempoEstadoActual;
 
     }
 
@@ -209,7 +210,7 @@ public class EntornoAgent extends Agent {
 
             System.out.println(" "); // print vector de info 
             for (Vehiculo v : vehiculos){
-                System.out.println(v.nombre + "= " + v.pos_x + "," + v.pos_y + "," + v.velocidad);
+                System.out.println("["+v.nombre + "] pos = (" + v.pos_x + "," + v.pos_y + ") velocidad=" + v.velocidad);
             }
 
         }
@@ -251,9 +252,10 @@ public class EntornoAgent extends Agent {
                 String[] contentArray = request.getContent().split(",");
                 int elID = Integer.parseInt(contentArray[1]);
 
-                vehiculos[elID].pos_x = Integer.parseInt(contentArray[2]);
+                // al ser por referencia ya deberia modificarse
+                /* vehiculos[elID].pos_x = Integer.parseInt(contentArray[2]);
                 vehiculos[elID].pos_y = Integer.parseInt(contentArray[3]);
-                vehiculos[elID].velocidad = Integer.parseInt(contentArray[4]);
+                vehiculos[elID].velocidad = Integer.parseInt(contentArray[4]); */
 
                 for (Vehiculo v : vehiculos){
                     

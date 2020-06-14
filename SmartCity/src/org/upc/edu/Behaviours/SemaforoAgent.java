@@ -57,11 +57,11 @@ public class SemaforoAgent extends Agent {
             ACLMessage propose = cfp.createReply();
             propose.setPerformative(ACLMessage.PROPOSE);
             // We provide a proposal
-            if (tiempoEstadoActual >= 10) {
+            if (miSemaforo.tiempoEstadoActual >= 10) {
                 proposedWaitingTime = 0;
             }
             else {
-                proposedWaitingTime = 10 - tiempoEstadoActual;
+                proposedWaitingTime = 10 - miSemaforo.tiempoEstadoActual;
             }
             System.out.println("Agent '" + getLocalName() + "' proposes  '" + proposedWaitingTime + "'");
             propose.setContent(String.valueOf(proposedWaitingTime));
@@ -99,19 +99,17 @@ public class SemaforoAgent extends Agent {
 
         public int onEnd() {
             System.out.println("Agent " + myAgent.getLocalName() + " actualizado:\n"
-                    + "   CalleCerrada : " + calleCerrada + "\n"
-                    + "   CalleAbierta : " + calleAbierta
-                    + "   tiempoActual : " + tiempoEstadoActual);
+                    + "   CalleCerrada : " + miSemaforo.calleCerrada + "\n"
+                    + "   tiempoActual : " + miSemaforo.tiempoEstadoActual);
 
 
             return 1; //indiferente
         }
 
         public void onWake() {
-            String aux   = calleAbierta;
-            calleAbierta = calleCerrada;
-            calleCerrada = aux;
-            tiempoEstadoActual = 0;
+            if (miSemaforo.calleCerrada == miSemaforo.calle1) miSemaforo.calleCerrada = miSemaforo.calle2;
+            else miSemaforo.calleCerrada = miSemaforo.calle1;
+            miSemaforo.tiempoEstadoActual = 0;
         }
 
     }
@@ -137,7 +135,7 @@ public class SemaforoAgent extends Agent {
         } */
 
         public void onTick() {
-            tiempoEstadoActual += 1;
+            miSemaforo.tiempoEstadoActual += 1;
         }
 
     }
@@ -153,13 +151,13 @@ public class SemaforoAgent extends Agent {
         miSemaforo = (EntornoAgent.Semaforo) args[1];
         calle1 = (EntornoAgent.Calle) args[2];
         calle2 = (EntornoAgent.Calle) args[3];
-        calleCerrada = (String) args[4];
-        if (calleCerrada.equals(calle1.nombre)) calleAbierta = calle2.nombre;
-        else calleAbierta = calle1.nombre;
+        //calleCerrada = (String) args[4];
+        //if (calleCerrada.equals(calle1.nombre)) calleAbierta = calle2.nombre;
+        //else calleAbierta = calle1.nombre;
+        //
 
         System.out.println("Agent " + this.getLocalName() + " inicial:\n"
-                + "   CalleCerrada : " + calleCerrada + "\n"
-                + "   CalleAbierta : " + calleAbierta);
+                + "   CalleCerrada : " + miSemaforo.calleCerrada);
 
         // REGISTRO DF
         final DFAgentDescription desc = new DFAgentDescription();
