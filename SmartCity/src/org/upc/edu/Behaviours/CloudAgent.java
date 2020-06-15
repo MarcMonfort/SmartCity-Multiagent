@@ -112,7 +112,6 @@ public class CloudAgent extends Agent {
 
                 myAgent.addBehaviour(new AchieveREInitiator(myAgent, proposeCloud) {
                     protected void handleAgree(ACLMessage agree) {
-                        negociacionEnCurso = false;
                         //System.out.println("[Cloud] Ya le ha llegado la respuesta al " + agree.getSender().getLocalName() + " !!!!");
                     }
                 });
@@ -157,7 +156,9 @@ public class CloudAgent extends Agent {
         MessageTemplate mt = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
         this.addBehaviour(new AchieveREResponder(this, mt) {
             protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {
-
+                return null;
+            }
+            protected ACLMessage handleRequest(ACLMessage request) {
                 semaforoSender = request.getSender();
                 // El tiempo del semaforoSender
                 minTiempoRequested = Integer.parseInt(request.getContent());
@@ -195,10 +196,18 @@ public class CloudAgent extends Agent {
 
                 return informDone;
             }
-            protected ACLMessage handleRequest(ACLMessage request) {
-                return null;
-            }
         });
 
+        // Semaforo sender informa de que ya se ha hecho el cambio de calles en los semaforos
+        mt = MessageTemplate.MatchContent("negociacion-finalizada");
+        this.addBehaviour(new AchieveREResponder(this, mt) {
+            protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {
+                negociacionEnCurso = false;
+                return null;
+            }
+            protected ACLMessage handleRequest(ACLMessage request) {
+               return null;
+            }
+        });
     }
 }

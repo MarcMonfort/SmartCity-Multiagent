@@ -159,9 +159,9 @@ public class SemaforoAgent extends Agent {
         protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) throws FailureException {
             int countdown = Integer.parseInt(accept.getContent());
             //System.out.println("Agent '" + getLocalName() + "' accepts proposal and is about to perform an action");
-            SemaforoWakerBehaviour b = new SemaforoWakerBehaviour(myAgent, countdown*1000);
+            SemaforoWakerBehaviour b = new SemaforoWakerBehaviour(myAgent, countdown*1000, false);
             myAgent.addBehaviour(b);
-            //System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "'");
+            System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "'");
             ACLMessage inform = accept.createReply();
             inform.setPerformative(ACLMessage.INFORM);
             inform.setContent(String.valueOf(countdown));
@@ -175,8 +175,11 @@ public class SemaforoAgent extends Agent {
 
     public class SemaforoWakerBehaviour extends WakerBehaviour {
 
-        public SemaforoWakerBehaviour(Agent a, long timeout) {
+        boolean iniciador;
+
+        public SemaforoWakerBehaviour(Agent a, long timeout, boolean ini) {
             super(a, timeout);
+            iniciador = ini;
         }
 
         public void onStart() {
@@ -196,6 +199,15 @@ public class SemaforoAgent extends Agent {
             if (miSemaforo.calleCerrada.equals(miSemaforo.calle1.nombre)) miSemaforo.calleCerrada = miSemaforo.calle2.nombre;
             else miSemaforo.calleCerrada = miSemaforo.calle1.nombre;
             miSemaforo.tiempoEstadoActual = 0;
+            if(iniciador) {
+                ACLMessage proposeCloud = new ACLMessage(ACLMessage.PROPOSE);
+                proposeCloud.setProtocol(FIPANames.InteractionProtocol.FIPA_PROPOSE);
+                proposeCloud.addReceiver(cloudAID);
+                proposeCloud.setSender(myAgent.getAID());
+                proposeCloud.setContent("negociacion-finalizada");
+
+                myAgent.addBehaviour(new AchieveREInitiator(myAgent, proposeCloud) {});
+            }
         }
 
     }
@@ -284,18 +296,21 @@ public class SemaforoAgent extends Agent {
         }
 
         // Recibe respuesta de cloud, con el tiempo de espera => invoca waker
-        MessageTemplate mt2 = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_PROPOSE);
-        this.addBehaviour(new AchieveREResponder(this, mt2) {
+       // MessageTemplate aux = MessageTemplate.not(MessageTemplate.MatchContent("negociacion-finalizada"));
+        MessageTemplate mt = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_PROPOSE);
+        //mt = MessageTemplate.and(mt, aux);
+        this.addBehaviour(new AchieveREResponder(this, mt) {
             protected ACLMessage prepareResultNotification(ACLMessage propose, ACLMessage response) {
                 return null;
             }
 
             protected ACLMessage handleRequest(ACLMessage propose) {
+                //System.out.println(myAgent.getLocalName() + ": countdown = " + propose.getContent());
                 int countdown = Integer.parseInt(propose.getContent());
                 //System.out.println("Agent '" + getLocalName() + "' recibió countdown del cloud... va a invocar a waker");
-                SemaforoWakerBehaviour b = new SemaforoWakerBehaviour(myAgent, countdown*1000);
+                SemaforoWakerBehaviour b = new SemaforoWakerBehaviour(myAgent, countdown*1000, true);
                 myAgent.addBehaviour(b);
-                //System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "'");
+                System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "' [SENDER]");
 
                 ACLMessage informDone  = propose.createReply();
                 informDone.setPerformative(ACLMessage.AGREE);
@@ -305,8 +320,7 @@ public class SemaforoAgent extends Agent {
 
 
         //Responder a la peticion del coche de ponerse verde
-        MessageTemplate mt = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
-
+        mt = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_REQUEST);
         this.addBehaviour(new AchieveREResponder(this, mt) {
             protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {
                 return null;
@@ -333,8 +347,8 @@ public class SemaforoAgent extends Agent {
             }
         });
 
-        MessageTemplate templ = MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-        ContractNetResponderBehaviour crb = new ContractNetResponderBehaviour(this, templ);
+        mt = MessageTemplate.MatchProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+        ContractNetResponderBehaviour crb = new ContractNetResponderBehaviour(this, mt);
         this.addBehaviour(crb);
 
         SemaforoTickerBehaviour b = new SemaforoTickerBehaviour(this, 1000);
