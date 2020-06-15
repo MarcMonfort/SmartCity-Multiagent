@@ -1,14 +1,13 @@
 package org.upc.edu.Behaviours;
 
-import org.apache.jena.ontology.Individual;
-import org.apache.jena.ontology.OntDocumentManager;
-import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.OntModelSpec;
-import org.apache.jena.rdf.model.ModelFactory;
-import org.apache.jena.rdf.model.NodeIterator;
-import org.apache.jena.rdf.model.Property;
+import org.apache.jena.base.Sys;
+import org.apache.jena.ontology.*;
+import org.apache.jena.query.*;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.sparql.core.ResultBinding;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 
 public class OntologyParser {
@@ -34,26 +33,41 @@ public class OntologyParser {
     }
 
     public EntornoAgent.Semaforo[] getSemaforos() {
-        Individual[] indiv_semaforos = new Individual[3];
-        indiv_semaforos[0] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Semaforo1");
-        indiv_semaforos[1] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Semaforo2");
-        indiv_semaforos[2] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Semaforo3");
 
         Property tienePosicion  = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tienePosicion");
         Property cierraPasoA  = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#cierraPasoA");
         Property ocurreEn  = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#ocurreEn");
 
-        EntornoAgent.Semaforo[] semaforos = new EntornoAgent.Semaforo[3];
-        for (int i = 0; i < 3; i++) {
-            semaforos[i] = new EntornoAgent.Semaforo();
 
-            semaforos[i].nombre = indiv_semaforos[i].getLocalName();
+        String queryString = "\n" +
+                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                "PREFIX sc: <http://www.semanticweb.org/sid/smartCity#>\n" +
+                "SELECT ?x \n" +
+                "WHERE {\n" +
+                "    ?x rdf:type sc:AgenteSemaforo.\n" +
+                "} LIMIT 100";
 
-            int[] pos = EntornoAgent.getCoord(indiv_semaforos[i].getPropertyValue(tienePosicion).asLiteral().getString());
-            semaforos[i].pos_x = pos[0];
-            semaforos[i].pos_y = pos[1];
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qe = QueryExecutionFactory.create(query, model);
+        ResultSet results = qe.execSelect();
+        HashMap<Integer, EntornoAgent.Semaforo> list_semaforos = new HashMap<>();
 
-            NodeIterator it = indiv_semaforos[i].listPropertyValues(ocurreEn);
+        while (results.hasNext()) {
+            ResultBinding res = (ResultBinding) results.next();
+            String uri = res.get("x").asResource().getURI();
+
+            Individual indiv = model.getIndividual(uri);
+
+            EntornoAgent.Semaforo semaforo = new EntornoAgent.Semaforo();
+
+            semaforo.nombre = indiv.getLocalName();
+
+            int[] pos = EntornoAgent.getCoord(indiv.getPropertyValue(tienePosicion).asLiteral().getString());
+            semaforo.pos_x = pos[0];
+            semaforo.pos_y = pos[1];
+
+            NodeIterator it = indiv.listPropertyValues(ocurreEn);
 
             EntornoAgent.Calle calle1 = new EntornoAgent.Calle();
             EntornoAgent.Calle calle2 = new EntornoAgent.Calle();
@@ -61,15 +75,27 @@ public class OntologyParser {
             calle1.nombre = it.next().asResource().getLocalName();
             calle2.nombre = it.next().asResource().getLocalName();
 
-            semaforos[i].calle1 = calle1;
-            semaforos[i].calle2 = calle2;
+            semaforo.calle1 = calle1;
+            semaforo.calle2 = calle2;
 
             //semaforos[i].calle1 = it.next().asResource().getLocalName();
             //semaforos[i].calle2 = it.next().asResource().getLocalName();
 
-            semaforos[i].calleCerrada = indiv_semaforos[i].getPropertyValue(cierraPasoA).asResource().getLocalName();
+            semaforo.calleCerrada = indiv.getPropertyValue(cierraPasoA).asResource().getLocalName();
+
+            int id_semaforo = Integer.parseInt(uri.substring(uri.length()-1)) - 1;
+            list_semaforos.put(id_semaforo, semaforo);
+
+        }
+        qe.close();
+
+        EntornoAgent.Semaforo[] semaforos = new EntornoAgent.Semaforo[list_semaforos.size()];
+        for (int i = 0; i < list_semaforos.size(); i++) {
+            semaforos[i] = list_semaforos.get(i);
         }
         return semaforos;
+
+
     }
 
     /* public EntornoAgent.Semaforo getSemaforo(String nombre) {
@@ -102,13 +128,6 @@ public class OntologyParser {
 
 
     public EntornoAgent.Calle[] getCalles() {
-        Individual[] indiv_calles = new Individual[6];
-        indiv_calles[0] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Calle1");
-        indiv_calles[1] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Calle2");
-        indiv_calles[2] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Calle3");
-        indiv_calles[3] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Calle4");
-        indiv_calles[4] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Calle5");
-        indiv_calles[5] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Calle6");
 
         Property tieneLongitud    = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tieneLongitud");
         Property tienePosicionIni = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tienePosicionIni");
@@ -121,80 +140,132 @@ public class OntologyParser {
         Property tieneInterseccion  = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#tieneInterseccion");
 
 
-        EntornoAgent.Calle[] calles = new EntornoAgent.Calle[6];
-        for (int i = 0; i < 6; i++) {
-            int[] coord_ini = EntornoAgent.getCoord(indiv_calles[i].getPropertyValue(tienePosicionIni).asLiteral().getString());
-            int[] coord_fin = EntornoAgent.getCoord(indiv_calles[i].getPropertyValue(tienePosicionFin).asLiteral().getString());
-            int[] direccion = EntornoAgent.getCoord(indiv_calles[i].getPropertyValue(tieneDireccion).asLiteral().getString());
+        String queryString = "\n" +
+                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                "PREFIX sc: <http://www.semanticweb.org/sid/smartCity#>\n" +
+                "SELECT ?x \n" +
+                "WHERE {\n" +
+                "    ?x rdf:type sc:Calle.\n" +
+                "} LIMIT 100";
 
-            calles[i] = new EntornoAgent.Calle();
-            calles[i].nombre = indiv_calles[i].getLocalName();
-            calles[i].longitud = indiv_calles[i].getPropertyValue(tieneLongitud).asLiteral().getInt();
-            calles[i].ini_x = coord_ini[0];
-            calles[i].ini_y = coord_ini[1];
-            calles[i].fin_x = coord_fin[0];
-            calles[i].fin_y = coord_fin[1];
-            calles[i].dir_x = direccion[0];
-            calles[i].dir_y = direccion[1];
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qe = QueryExecutionFactory.create(query, model);
+        ResultSet results = qe.execSelect();
+        HashMap<Integer, EntornoAgent.Calle> list_calles = new HashMap<>();
+
+        while (results.hasNext()) {
+            ResultBinding res = (ResultBinding) results.next();
+            String uri = res.get("x").asResource().getURI();
+
+            Individual indiv = model.getIndividual(uri);
+
+
+            EntornoAgent.Calle calle = new EntornoAgent.Calle();
+
+            int[] coord_ini = EntornoAgent.getCoord(indiv.getPropertyValue(tienePosicionIni).asLiteral().getString());
+            int[] coord_fin = EntornoAgent.getCoord(indiv.getPropertyValue(tienePosicionFin).asLiteral().getString());
+            int[] direccion = EntornoAgent.getCoord(indiv.getPropertyValue(tieneDireccion).asLiteral().getString());
+
+            calle.nombre = indiv.getLocalName();
+            calle.longitud = indiv.getPropertyValue(tieneLongitud).asLiteral().getInt();
+            calle.ini_x = coord_ini[0];
+            calle.ini_y = coord_ini[1];
+            calle.fin_x = coord_fin[0];
+            calle.fin_y = coord_fin[1];
+            calle.dir_x = direccion[0];
+            calle.dir_y = direccion[1];
 
             //NUEVO
             ArrayList<EntornoAgent.Semaforo> semaforos = new ArrayList<>();
-            NodeIterator it = indiv_calles[i].listPropertyValues(contiene);
+            NodeIterator it = indiv.listPropertyValues(contiene);
             while (it.hasNext()) {
                 EntornoAgent.Semaforo semaforo = new EntornoAgent.Semaforo();
                 semaforo.nombre = it.next().asResource().getLocalName();
                 semaforos.add(semaforo);
             }
-            calles[i].semaforos = semaforos;
+            calle.semaforos = semaforos;
 
 
             EntornoAgent.Calle siguiente = new EntornoAgent.Calle();
-            siguiente.nombre = indiv_calles[i].getPropertyValue(tieneSiguiente).asResource().getLocalName();
-            calles[i].siguiente = siguiente;
+            siguiente.nombre = indiv.getPropertyValue(tieneSiguiente).asResource().getLocalName();
+            calle.siguiente = siguiente;
 
 
             ArrayList<EntornoAgent.Calle> intersecciones = new ArrayList<>();
-            it = indiv_calles[i].listPropertyValues(tieneInterseccion);
+            it = indiv.listPropertyValues(tieneInterseccion);
             while (it.hasNext()) {
                 EntornoAgent.Calle interseccion = new EntornoAgent.Calle();
                 interseccion.nombre = it.next().asResource().getLocalName();
                 intersecciones.add(interseccion);
             }
-            calles[i].inter = intersecciones;
+            calle.inter = intersecciones;
 
+            int id_calle = Integer.parseInt(uri.substring(uri.length()-1)) - 1;
+            list_calles.put(id_calle, calle);
+
+        }
+        EntornoAgent.Calle[] calles = new EntornoAgent.Calle[list_calles.size()];
+        for (int i = 0; i < list_calles.size(); i++) {
+            calles[i] = list_calles.get(i);
         }
         return calles;
     }
 
 
     public EntornoAgent.Vehiculo[] getVehiculos() {
-        Individual[] indiv_vehiculos = new Individual[2];
-        indiv_vehiculos[0] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Vehiculo1");
-        indiv_vehiculos[1] = model.getIndividual("http://www.semanticweb.org/sid/smartCity#Vehiculo2");
 
         Property tienePosicion  = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tienePosicion");
         Property tieneObjetivo  = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tieneObjetivo");
         Property tieneVelocidad = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tieneVelocidad");
         Property ocurreEn = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#ocurreEn");
 
-        EntornoAgent.Vehiculo[] vehiculos = new EntornoAgent.Vehiculo[2];
-        for (int i = 0; i < 2; i++) {
-            vehiculos[i] = new EntornoAgent.Vehiculo();
+        String queryString = "\n" +
+                "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
+                "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>\n" +
+                "PREFIX sc: <http://www.semanticweb.org/sid/smartCity#>\n" +
+                "SELECT ?x \n" +
+                "WHERE {\n" +
+                "    ?x rdf:type sc:AgenteVehiculo.\n" +
+                "} LIMIT 100";
 
-            int[] pos = EntornoAgent.getCoord(indiv_vehiculos[i].getPropertyValue(tienePosicion).asLiteral().getString());
-            int[] obj = EntornoAgent.getCoord(indiv_vehiculos[i].getPropertyValue(tieneObjetivo).asLiteral().getString());
+        Query query = QueryFactory.create(queryString);
+        QueryExecution qe = QueryExecutionFactory.create(query, model);
+        ResultSet results = qe.execSelect();
+        HashMap<Integer, EntornoAgent.Vehiculo> list_vehiculos = new HashMap<>();
 
-            vehiculos[i].nombre = indiv_vehiculos[i].getLocalName();
-            vehiculos[i].velocidad = indiv_vehiculos[i].getPropertyValue(tieneVelocidad).asLiteral().getInt();
-            vehiculos[i].pos_x = pos[0];
-            vehiculos[i].pos_y = pos[1];
-            vehiculos[i].obj_x = obj[0];
-            vehiculos[i].obj_y = obj[1];
+        while (results.hasNext()) {
+            ResultBinding res = (ResultBinding) results.next();
+            String uri = res.get("x").asResource().getURI();
+
+            Individual indiv = model.getIndividual(uri);
+
+            EntornoAgent.Vehiculo vehiculo = new EntornoAgent.Vehiculo();
+
+            int[] pos = EntornoAgent.getCoord(indiv.getPropertyValue(tienePosicion).asLiteral().getString());
+            int[] obj = EntornoAgent.getCoord(indiv.getPropertyValue(tieneObjetivo).asLiteral().getString());
+
+            vehiculo.nombre = indiv.getLocalName();
+            vehiculo.velocidad = indiv.getPropertyValue(tieneVelocidad).asLiteral().getInt();
+            vehiculo.pos_x = pos[0];
+            vehiculo.pos_y = pos[1];
+            vehiculo.obj_x = obj[0];
+            vehiculo.obj_y = obj[1];
 
             EntornoAgent.Calle calleActual = new EntornoAgent.Calle();
-            calleActual.nombre = indiv_vehiculos[i].getPropertyValue(ocurreEn).asResource().getLocalName();
-            vehiculos[i].calleActual = calleActual;
+            calleActual.nombre = indiv.getPropertyValue(ocurreEn).asResource().getLocalName();
+            vehiculo.calleActual = calleActual;
             //vehiculos[i].calle_actual = indiv_vehiculos[i].getPropertyValue(ocurreEn).asResource().getLocalName();
+
+            int id_vehiculo = Integer.parseInt(uri.substring(uri.length()-1)) - 1;
+            list_vehiculos.put(id_vehiculo, vehiculo);
+
+        }
+        qe.close();
+
+        EntornoAgent.Vehiculo[] vehiculos = new EntornoAgent.Vehiculo[list_vehiculos.size()];
+        for (int i = 0; i < list_vehiculos.size(); i++) {
+            vehiculos[i] = list_vehiculos.get(i);
         }
         return vehiculos;
     }

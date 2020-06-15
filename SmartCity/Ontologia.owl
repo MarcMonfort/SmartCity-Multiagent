@@ -42,7 +42,7 @@
 
     <owl:ObjectProperty rdf:about="http://www.semanticweb.org/sid/smartCity#cierraPasoA">
         <rdfs:subPropertyOf rdf:resource="http://www.w3.org/2002/07/owl#topObjectProperty"/>
-        <rdfs:domain rdf:resource="http://www.semanticweb.org/sid/smartCity#AgentSemaforo"/>
+        <rdfs:domain rdf:resource="http://www.semanticweb.org/sid/smartCity#AgenteSemaforo"/>
         <rdfs:range rdf:resource="http://www.semanticweb.org/sid/smartCity#Via"/>
     </owl:ObjectProperty>
     
@@ -495,27 +495,6 @@
     
 
 
-    <!-- http://www.semanticweb.org/sid/smartCity#AgentSemaforo -->
-
-    <owl:Class rdf:about="http://www.semanticweb.org/sid/smartCity#AgentSemaforo">
-        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/sid/smartCity#AgenteEdge"/>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.semanticweb.org/sid/smartCity#cierraPasoA"/>
-                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/sid/smartCity#Via"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-        <rdfs:subClassOf>
-            <owl:Restriction>
-                <owl:onProperty rdf:resource="http://www.semanticweb.org/sid/smartCity#ocurreEn"/>
-                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
-                <owl:onClass rdf:resource="http://www.semanticweb.org/sid/smartCity#Via"/>
-            </owl:Restriction>
-        </rdfs:subClassOf>
-    </owl:Class>
-    
-
-
     <!-- http://www.semanticweb.org/sid/smartCity#Agente -->
 
     <owl:Class rdf:about="http://www.semanticweb.org/sid/smartCity#Agente">
@@ -587,6 +566,27 @@
 
     <owl:Class rdf:about="http://www.semanticweb.org/sid/smartCity#AgenteRouter">
         <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/sid/smartCity#AgenteEdge"/>
+    </owl:Class>
+    
+
+
+    <!-- http://www.semanticweb.org/sid/smartCity#AgenteSemaforo -->
+
+    <owl:Class rdf:about="http://www.semanticweb.org/sid/smartCity#AgenteSemaforo">
+        <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/sid/smartCity#AgenteEdge"/>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/sid/smartCity#cierraPasoA"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/sid/smartCity#Via"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
+        <rdfs:subClassOf>
+            <owl:Restriction>
+                <owl:onProperty rdf:resource="http://www.semanticweb.org/sid/smartCity#ocurreEn"/>
+                <owl:minQualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:minQualifiedCardinality>
+                <owl:onClass rdf:resource="http://www.semanticweb.org/sid/smartCity#Via"/>
+            </owl:Restriction>
+        </rdfs:subClassOf>
     </owl:Class>
     
 
@@ -673,7 +673,7 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/sid/smartCity#esActuadorDe"/>
                 <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onClass rdf:resource="http://www.semanticweb.org/sid/smartCity#AgentSemaforo"/>
+                <owl:onClass rdf:resource="http://www.semanticweb.org/sid/smartCity#AgenteSemaforo"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -802,7 +802,7 @@
         <rdfs:subClassOf>
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/sid/smartCity#esCapacidadDe"/>
-                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/sid/smartCity#AgentSemaforo"/>
+                <owl:someValuesFrom rdf:resource="http://www.semanticweb.org/sid/smartCity#AgenteSemaforo"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -1122,7 +1122,7 @@
             <owl:Restriction>
                 <owl:onProperty rdf:resource="http://www.semanticweb.org/sid/smartCity#esActuadorDe"/>
                 <owl:qualifiedCardinality rdf:datatype="http://www.w3.org/2001/XMLSchema#nonNegativeInteger">1</owl:qualifiedCardinality>
-                <owl:onClass rdf:resource="http://www.semanticweb.org/sid/smartCity#AgentSemaforo"/>
+                <owl:onClass rdf:resource="http://www.semanticweb.org/sid/smartCity#AgenteSemaforo"/>
             </owl:Restriction>
         </rdfs:subClassOf>
     </owl:Class>
@@ -1621,7 +1621,7 @@
     <!-- http://www.semanticweb.org/sid/smartCity#Semaforo1 -->
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/sid/smartCity#Semaforo1">
-        <rdf:type rdf:resource="http://www.semanticweb.org/sid/smartCity#AgentSemaforo"/>
+        <rdf:type rdf:resource="http://www.semanticweb.org/sid/smartCity#AgenteSemaforo"/>
         <cierraPasoA rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle5"/>
         <ocurreEn rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle1"/>
         <ocurreEn rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle5"/>
@@ -1636,7 +1636,7 @@
     <!-- http://www.semanticweb.org/sid/smartCity#Semaforo2 -->
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/sid/smartCity#Semaforo2">
-        <rdf:type rdf:resource="http://www.semanticweb.org/sid/smartCity#AgentSemaforo"/>
+        <rdf:type rdf:resource="http://www.semanticweb.org/sid/smartCity#AgenteSemaforo"/>
         <cierraPasoA rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle6"/>
         <ocurreEn rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle2"/>
         <ocurreEn rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle6"/>
@@ -1651,7 +1651,7 @@
     <!-- http://www.semanticweb.org/sid/smartCity#Semaforo3 -->
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/sid/smartCity#Semaforo3">
-        <rdf:type rdf:resource="http://www.semanticweb.org/sid/smartCity#AgentSemaforo"/>
+        <rdf:type rdf:resource="http://www.semanticweb.org/sid/smartCity#AgenteSemaforo"/>
         <cierraPasoA rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle5"/>
         <ocurreEn rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle5"/>
         <ocurreEn rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle6"/>
@@ -1698,6 +1698,18 @@
         <seComunicaCon rdf:resource="http://www.semanticweb.org/sid/smartCity#Vehiculo1"/>
         <tieneObjetivo rdf:datatype="http://www.semanticweb.org/sid/smartCity#coord">10,0</tieneObjetivo>
         <tienePosicion rdf:datatype="http://www.semanticweb.org/sid/smartCity#coord">10,10</tienePosicion>
+        <tieneVelocidad rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</tieneVelocidad>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- http://www.semanticweb.org/sid/smartCity#Vehiculo3 -->
+
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/sid/smartCity#Vehiculo3">
+        <rdf:type rdf:resource="http://www.semanticweb.org/sid/smartCity#AgenteVehiculo"/>
+        <ocurreEn rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle4"/>
+        <tieneObjetivo rdf:datatype="http://www.semanticweb.org/sid/smartCity#coord">0,0</tieneObjetivo>
+        <tienePosicion rdf:datatype="http://www.semanticweb.org/sid/smartCity#coord">10,0</tienePosicion>
         <tieneVelocidad rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</tieneVelocidad>
     </owl:NamedIndividual>
 </rdf:RDF>
