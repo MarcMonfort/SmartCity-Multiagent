@@ -107,9 +107,9 @@ public class EntornoAgent extends Agent {
         System.out.println("Ontology loaded");
 
         ContainerController cc = getContainerController();
-        AgentController sniffer = cc.createNewAgent("Sniffer", Sniffer.class.getName(), null);
-        sniffer.start();
-        System.out.println("Sniffer started");
+        //AgentController sniffer = cc.createNewAgent("Sniffer", Sniffer.class.getName(), null);
+        //sniffer.start();
+        //System.out.println("Sniffer started");
 
         System.out.println("INSTANCIAS DE CALLES:");
         calles = parser.getCalles();
