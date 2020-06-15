@@ -54,14 +54,14 @@ public class VehiculoAgent extends Agent {
             //llegado al destino
             if (miVehiculo.pos_x == miVehiculo.obj_x && miVehiculo.pos_y == miVehiculo.obj_y){
                 //miVehiculo.velocidad = 0;
-                System.out.println(miVehiculo.nombre + ": DESTINO!!!");
+                //System.out.println(miVehiculo.nombre + ": DESTINO!!!");
                 //hacer un pause(3 segundos)...
                 // nuevo objetivo
                 Random rand = new Random();
                 miVehiculo.obj_x = rand.nextInt(3) * 5;
                 miVehiculo.obj_y = rand.nextInt(3) * 5;
 
-                System.out.println(miVehiculo.nombre + ": Nuevo Objetivo (" + miVehiculo.obj_x +","+miVehiculo.obj_y+")");
+                //System.out.println(miVehiculo.nombre + ": Nuevo Objetivo (" + miVehiculo.obj_x +","+miVehiculo.obj_y+")");
 
                 //miVehiculo.velocidad = 1;
             }
@@ -80,7 +80,7 @@ public class VehiculoAgent extends Agent {
                 }
             }
             if (distVehiculoCarcano == 1) { // tanto si es otro vehiculo
-                System.out.println(miVehiculo.nombre + "  va a chocar...");
+                //System.out.println(miVehiculo.nombre + "  va a chocar...");
                 miVehiculo.velocidad = 0;
                 // esperas o envias mensaje
             }
@@ -95,7 +95,7 @@ public class VehiculoAgent extends Agent {
 
             //final calle
             if (miVehiculo.pos_x == miVehiculo.calleActual.fin_x && miVehiculo.pos_y == miVehiculo.calleActual.fin_y){
-                System.out.println(miVehiculo.nombre + "  Ha llegado al final de la calle");
+                //System.out.println(miVehiculo.nombre + "  Ha llegado al final de la calle");
 
                 miVehiculo.calleActual.vehiculos.remove(miVehiculo.nombre);
                 miVehiculo.calleActual = miVehiculo.calleActual.siguiente;
@@ -106,7 +106,7 @@ public class VehiculoAgent extends Agent {
             // ha llegado a una intersección... decidir si cambiar o no... si su destino esta en la nueva calle, cambia a esa calle!
             for (EntornoAgent.Calle calle_inter : miVehiculo.calleActual.inter) {
                 if (((miVehiculo.pos_x - calle_inter.ini_x) * miVehiculo.calleActual.dir_x + (miVehiculo.pos_y - calle_inter.ini_y) * miVehiculo.calleActual.dir_y)==0) {
-                    System.out.println(miVehiculo.nombre + "  Estoy en una interseccioin");
+                    //System.out.println(miVehiculo.nombre + "  Estoy en una interseccioin");
 
 
                     boolean cambiar = (calle_inter.ini_x - miVehiculo.obj_x) * calle_inter.dir_y + (calle_inter.ini_y - miVehiculo.obj_y) * calle_inter.dir_x == 0;
@@ -131,7 +131,7 @@ public class VehiculoAgent extends Agent {
                     if (miVehiculo.calleActual.nombre.equals(semaforo.calleCerrada)) {
                         miVehiculo.velocidad = 0;
                         if (!semaforoRojoConsultado) {
-                            System.out.println(miVehiculo.nombre + "  Esperando en : " + semaforo.nombre);
+                            //System.out.println(miVehiculo.nombre + "  Esperando en : " + semaforo.nombre);
 
                             DFAgentDescription search_template;
                             ServiceDescription sd = new ServiceDescription();
@@ -163,7 +163,7 @@ public class VehiculoAgent extends Agent {
                                 }
                             });
                             semaforoRojoConsultado = true;
-                            System.out.println(myAgent.getLocalName() + ": ESPERANDO RESPUESTA DEL SEMAFORO");
+                            //System.out.println(myAgent.getLocalName() + ": ESPERANDO RESPUESTA DEL SEMAFORO");
                         }
 
                     } 
@@ -172,7 +172,7 @@ public class VehiculoAgent extends Agent {
                         semaforoRojoConsultado = false;
                         if (miVehiculo.velocidad == 0 && distVehiculoCarcano > 1){
                             miVehiculo.velocidad = 1;
-                            System.out.println(myAgent.getLocalName() +" ACTIVADO");
+                            //System.out.println(myAgent.getLocalName() +" ACTIVADO");
                         }
                     }
                 }
@@ -260,7 +260,7 @@ public class VehiculoAgent extends Agent {
         // FIN REGISTRO DF
         System.out.println("agente : " + this.getLocalName() + " registrado!!!");
 
-        VehiculoTickerBehaviour b = new VehiculoTickerBehaviour(this, 1000);
+        VehiculoTickerBehaviour b = new VehiculoTickerBehaviour(this, 300);
         this.addBehaviour(b);
     }
 }

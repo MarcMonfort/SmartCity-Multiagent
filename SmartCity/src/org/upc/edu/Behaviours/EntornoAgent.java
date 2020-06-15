@@ -195,8 +195,9 @@ public class EntornoAgent extends Agent {
             int id_calle = Integer.parseInt(vehiculos[i].calleActual.nombre.substring(vehiculos[i].calleActual.nombre.length() - 1)) - 1;
             vehiculos[i].calleActual = calles[id_calle];
             
-            vehiculos[i].calleActual.vehiculos.put(vehiculos[i].nombre, vehiculos[i]); //puede que error no inicializado
+            vehiculos[i].calleActual.vehiculos.put(vehiculos[i].nombre, vehiculos[i]);
 
+            vehiculos[i].ID = i;
 
             args[0] = i; //id vehiculo... se podria obtener deel nombre...
             args[1] = vehiculos[i];
@@ -225,10 +226,84 @@ public class EntornoAgent extends Agent {
                 System.out.println("["+s.nombre + "] calleCerrada: " + s.calleCerrada);
             }
 
+            for (int i = 10; i >= 0; i--) {
+                for (int j = 0; j <= 10; j++) {
+                    int v = buscaVehiculos(i,j);
+                    int s = buscaSemaforo(i,j);
+                    int o = buscaObjetivo(i,j);
+                    if(v != -1) {
+                        String color = String.format("\u001b[3%dm", v+3);
+                        
+                        System.out.print(color + (v+1) + "\u001b[0m" + " ");
+                    }
+                    else if (s != -1) {
+                        if (s == 0) System.out.print("\u001b[31m"+"◉" + "\u001b[0m" + " ");
+                        else if (s == 1) System.out.print("\u001b[32m" + "◉" + "\u001b[0m"+  " ");
+                    }
+                    else if (o != -1) {
+                        String color = String.format("\u001b[3%dm", o+3);
+                        System.out.print(color + "▴" + "\u001b[0m" + " ");
+                    }
+                    else if(i==0 || i==5 || i==10 || j==0 || j==5 || j==10) System.out.print("· ");
+                    else System.out.print("  ");
+                }
+                System.out.print("\n");
+            }
+
         }
 
     }
+    
+    
+    public int buscaVehiculos(int i, int j) {
+        int n = -1;
+        boolean found = false;
+        for (Vehiculo v: vehiculos) {
+            if (v.pos_x == j && v.pos_y == i) {
+                if (found) System.out.println("ERROOOOOOOOORRRR");
+                else {
+                    n = v.ID;
+                    found = true;
+                }
+            }
+        }
+        return n;
+    }
 
+    public int buscaObjetivo(int i, int j) {
+        int n = -1;
+        for (Vehiculo v: vehiculos) {
+            if (v.obj_x == j && v.obj_y == i) {
+                n = v.ID;
+            }
+        }
+        return n;
+    }
+
+    public int buscaSemaforo(int i, int j) {
+        int n = -1;
+        for (Semaforo s: semaforos) {
+            int dir_x = s.calle1.dir_x;
+            int dir_y = s.calle1.dir_y;
+
+            int dir_x_2 = s.calle2.dir_x;
+            int dir_y_2 = s.calle2.dir_y;
+
+            if ( (j + dir_x)==s.pos_x && (i + dir_y)==s.pos_y ) {
+                if (s.calleCerrada.equals(s.calle1.nombre)){
+                    n = 0;
+                }
+                else n = 1;
+            }
+            else if ( (j + dir_x_2)==s.pos_x && (i + dir_y_2)==s.pos_y ) {
+                if (s.calleCerrada.equals(s.calle2.nombre)){
+                    n = 0;
+                }
+                else n = 1;
+            }
+        }
+        return n;
+    }
     
 
     protected void setup() {
@@ -294,7 +369,7 @@ public class EntornoAgent extends Agent {
             }
         }); */
 
-        EntornoTickerBehaviour b = new EntornoTickerBehaviour(this, 1000);
+        EntornoTickerBehaviour b = new EntornoTickerBehaviour(this, 300);
         this.addBehaviour(b);
 
     }

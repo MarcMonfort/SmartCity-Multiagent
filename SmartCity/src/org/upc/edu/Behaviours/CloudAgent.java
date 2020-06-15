@@ -34,6 +34,7 @@ public class CloudAgent extends Agent {
     EntornoAgent.Semaforo[] semaforos;
     AID semaforoSender;
     boolean respuestaPendiente;
+    boolean negociacionEnCurso = false;
     int minTiempoRequested;
     //EntornoAgent.Calle[] calles;
 
@@ -111,9 +112,11 @@ public class CloudAgent extends Agent {
 
                 myAgent.addBehaviour(new AchieveREInitiator(myAgent, proposeCloud) {
                     protected void handleAgree(ACLMessage agree) {
+                        negociacionEnCurso = false;
                         //System.out.println("[Cloud] Ya le ha llegado la respuesta al " + agree.getSender().getLocalName() + " !!!!");
                     }
                 });
+                
             }
 
         }
@@ -174,9 +177,12 @@ public class CloudAgent extends Agent {
                 msg.setReplyByDate(new Date(System.currentTimeMillis() + 1000));
 
                 respuestaPendiente = true;
-                System.out.println("Cloud empieza ContractNetInitiator!!!");
-                ContractNetInitiatorBehaviour cib = new ContractNetInitiatorBehaviour(myAgent, msg);
-                addBehaviour(cib);
+                //System.out.println("Cloud empieza ContractNetInitiator!!!");
+                if (!negociacionEnCurso) {
+                    ContractNetInitiatorBehaviour cib = new ContractNetInitiatorBehaviour(myAgent, msg);
+                    addBehaviour(cib);
+                    negociacionEnCurso = true;
+                }
 
                 MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
                 //ACLMessage resultado = myAgent.blockingReceive(mt);

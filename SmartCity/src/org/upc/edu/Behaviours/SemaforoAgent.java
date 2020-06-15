@@ -82,11 +82,11 @@ public class SemaforoAgent extends Agent {
             fin_y = ini_y + cA.longitud/2;
         }
 
-        System.out.println(miSemaforo.nombre + " cA = " + cA.nombre);
+        //System.out.println(miSemaforo.nombre + " cA = " + cA.nombre);
         for (EntornoAgent.Vehiculo v : cA.vehiculos.values()){
             if (v.pos_x >= ini_x && v.pos_y >= ini_y &&  v.pos_x <= fin_x && v.pos_y <= fin_y) {
                 proposedWaitingTime++;
-                System.out.println(miSemaforo.nombre + " cA   " + "    +1 => " + v.nombre);
+                //System.out.println(miSemaforo.nombre + " cA   " + "    +1 => " + v.nombre);
             }
         }
 
@@ -116,15 +116,15 @@ public class SemaforoAgent extends Agent {
             fin_y = ini_y + cC.longitud/2;
         }
 
-        System.out.println(miSemaforo.nombre + " cC = " + cC.nombre);
+        //System.out.println(miSemaforo.nombre + " cC = " + cC.nombre);
         for (EntornoAgent.Vehiculo v : cC.vehiculos.values()){
             if (v.pos_x >= ini_x && v.pos_y >= ini_y &&  v.pos_x <= fin_x && v.pos_y <= fin_y) {
                 proposedWaitingTime--;
-                System.out.println(miSemaforo.nombre + " cC   " + "    -1 => " + v.nombre);
+                //System.out.println(miSemaforo.nombre + " cC   " + "    -1 => " + v.nombre);
             }
         }
 
-        //if (proposedWaitingTime < 0) proposedWaitingTime = 0;
+        if (proposedWaitingTime < 0) proposedWaitingTime = 0;
         return proposedWaitingTime;
     }
 
@@ -149,7 +149,7 @@ public class SemaforoAgent extends Agent {
             // We provide a proposal
             int proposedWaitingTime = getTiempoEspera();
             
-            System.out.println("Agent '" + getLocalName() + "' proposes  '" + proposedWaitingTime + "'");
+            //System.out.println("Agent '" + getLocalName() + "' proposes  '" + proposedWaitingTime + "'");
             propose.setContent(String.valueOf(proposedWaitingTime));
             return propose;
 
@@ -161,7 +161,7 @@ public class SemaforoAgent extends Agent {
             //System.out.println("Agent '" + getLocalName() + "' accepts proposal and is about to perform an action");
             SemaforoWakerBehaviour b = new SemaforoWakerBehaviour(myAgent, countdown*1000);
             myAgent.addBehaviour(b);
-            System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "'");
+            //System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "'");
             ACLMessage inform = accept.createReply();
             inform.setPerformative(ACLMessage.INFORM);
             inform.setContent(String.valueOf(countdown));
@@ -184,9 +184,9 @@ public class SemaforoAgent extends Agent {
         }
 
         public int onEnd() {
-            System.out.println("Agent " + myAgent.getLocalName() + " actualizado:\n"
-                    + "   CalleCerrada : " + miSemaforo.calleCerrada + "\n"
-                    + "   tiempoActual : " + miSemaforo.tiempoEstadoActual);
+            //System.out.println("Agent " + myAgent.getLocalName() + " actualizado:\n"
+            //        + "   CalleCerrada : " + miSemaforo.calleCerrada + "\n"
+            //        + "   tiempoActual : " + miSemaforo.tiempoEstadoActual);
 
 
             return 1; //indiferente
@@ -295,7 +295,7 @@ public class SemaforoAgent extends Agent {
                 //System.out.println("Agent '" + getLocalName() + "' recibió countdown del cloud... va a invocar a waker");
                 SemaforoWakerBehaviour b = new SemaforoWakerBehaviour(myAgent, countdown*1000);
                 myAgent.addBehaviour(b);
-                System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "'");
+                //System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "'");
 
                 ACLMessage informDone  = propose.createReply();
                 informDone.setPerformative(ACLMessage.AGREE);
@@ -318,7 +318,7 @@ public class SemaforoAgent extends Agent {
                 requestCloud.setSender(myAgent.getAID());
                 int miTiempo = getTiempoEspera();
                 requestCloud.setContent(String.valueOf(miTiempo));
-                System.out.println("Agent " + myAgent.getLocalName() + "va a llamar a Cloud con tiempo: " + miTiempo);
+                //System.out.println("Agent " + myAgent.getLocalName() + "va a llamar a Cloud con tiempo: " + miTiempo);
 
                 // Pregunta al cloud para que negocie con los otros semaforos
                 myAgent.addBehaviour(new AchieveREInitiator(myAgent, requestCloud) {
