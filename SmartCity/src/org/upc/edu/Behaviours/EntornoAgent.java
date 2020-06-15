@@ -71,6 +71,8 @@ public class EntornoAgent extends Agent {
         public Calle calle1;
         public Calle calle2;
 
+        public boolean pausa = false;
+
     }
 
     public static int[] getCoord(String c) {
@@ -83,10 +85,14 @@ public class EntornoAgent extends Agent {
 
     //private ArrayList<Vehiculo> info_vehiculos;
 
-    private HashMap<String, Vehiculo> info_vehiculos = new HashMap<>();
-    private Calle[] calles;
+    //private HashMap<String, Vehiculo> info_vehiculos = new HashMap<>();
+    /* private Calle[] calles;
     private Vehiculo[] vehiculos;
-    private Semaforo[] semaforos;
+    private Semaforo[] semaforos; */
+
+    private HashMap<String, Calle> calles;
+    private HashMap<String, Vehiculo> vehiculos;
+    private HashMap<String, Semaforo> semaforos;
     
     private void inicializarEntorno() throws StaleProxyException {
         String JENA = "./";
@@ -108,11 +114,11 @@ public class EntornoAgent extends Agent {
         System.out.println("INSTANCIAS DE CALLES:");
         calles = parser.getCalles();
 
-        for (int i = 0; i < calles.length; i++) {
-            System.out.println(calles[i].nombre + ":");
-            System.out.println("  Longitud: " + calles[i].longitud);
-            System.out.println("  Pos ini : " + calles[i].ini_x + ", " + calles[i].ini_y);
-            System.out.println("  Pos fin : " + calles[i].fin_x + ", " + calles[i].fin_y);
+        for (Calle c : calles.values()) {
+            System.out.println(c.nombre + ":");
+            System.out.println("  Longitud: " + c.longitud);
+            System.out.println("  Pos ini : " + c.ini_x + ", " + c.ini_y);
+            System.out.println("  Pos fin : " + c.fin_x + ", " + c.fin_y);
 
         }
 
@@ -121,39 +127,37 @@ public class EntornoAgent extends Agent {
         System.out.println("INSTANCIAS DE SEMAFOROS:");
         semaforos = parser.getSemaforos();
 
-        for (int i = 0; i < semaforos.length; i++) {
-            System.out.println(semaforos[i].nombre + ":");
-            System.out.println("  Calle1 : " + semaforos[i].calle1.nombre);
-            System.out.println("  Calle2 : " + semaforos[i].calle2.nombre);
+        for (Semaforo s : semaforos.values()) {
+            System.out.println(s.nombre + ":");
+            System.out.println("  Calle1 : " + s.calle1.nombre);
+            System.out.println("  Calle2 : " + s.calle2.nombre);
 
-            System.out.println("  Pos : " + semaforos[i].pos_x + ", " + semaforos[i].pos_y);
-            System.out.println("  CalleCerrada : " + semaforos[i].calleCerrada);
-            Object[] args = new Object[5];
+            System.out.println("  Pos : " + s.pos_x + ", " + s.pos_y);
+            System.out.println("  CalleCerrada : " + s.calleCerrada);
+            Object[] args = new Object[1];
 
-            String nombre_calle1 = semaforos[i].calle1.nombre;
-            String nombre_calle2 = semaforos[i].calle2.nombre;
+            //String nombre_calle1 = s.calle1.nombre;
+            //String nombre_calle2 = s.calle2.nombre;
 
-            int id_calle1 = Integer.parseInt(nombre_calle1.substring(nombre_calle1.length() - 1)) - 1;
-            int id_calle2 = Integer.parseInt(nombre_calle2.substring(nombre_calle2.length() - 1)) - 1;
+            //int id_calle1 = Integer.parseInt(nombre_calle1.substring(nombre_calle1.length() - 1)) - 1;
+            //int id_calle2 = Integer.parseInt(nombre_calle2.substring(nombre_calle2.length() - 1)) - 1;
 
-            semaforos[i].calle1 = calles[id_calle1];
-            semaforos[i].calle2 = calles[id_calle2];
 
-            args[0] = i;
-            args[1] = semaforos[i];
-            args[2] = calles[id_calle1];
-            args[3] = calles[id_calle2];
-            args[4] = semaforos[i].calleCerrada;
-            AgentController ac = cc.createNewAgent(semaforos[i].nombre, "org.upc.edu.Behaviours.SemaforoAgent", args);
+            s.calle1 = calles.get(s.calle1.nombre);
+            s.calle2 = calles.get(s.calle2.nombre);
+
+            args[0] = s;
+
+            AgentController ac = cc.createNewAgent(s.nombre, "org.upc.edu.Behaviours.SemaforoAgent", args);
             ac.start();
         }
 
         {
-        Object[] args = new Object[1];
-        args[0] = semaforos;
-        //args[1] = calles
-        AgentController ac = cc.createNewAgent("CentroDeDatos", "org.upc.edu.Behaviours.CloudAgent", args);
-        ac.start();
+            Object[] args = new Object[1];
+            args[0] = semaforos;
+            //args[1] = calles
+            AgentController ac = cc.createNewAgent("CentroDeDatos", "org.upc.edu.Behaviours.CloudAgent", args);
+            ac.start();
         }
 
 
@@ -161,49 +165,54 @@ public class EntornoAgent extends Agent {
         vehiculos = parser.getVehiculos();
 
         // crea objetos calle siguiente i calle interseccion (actuan como punteros)
-        for (Calle c : calles) { //relaciona calles con calles
+        for (Calle c : calles.values()) { //relaciona calles con calles
 
-            int id_calle = Integer.parseInt(c.siguiente.nombre.substring(c.siguiente.nombre.length() - 1)) - 1;
-            c.siguiente = calles[id_calle];
+            //int id_calle = Integer.parseInt(c.siguiente.nombre.substring(c.siguiente.nombre.length() - 1)) - 1;
+            //c.siguiente = calles[id_calle];
+            c.siguiente = calles.get(c.siguiente.nombre);
 
             ArrayList<Calle> intersecciones = new ArrayList<>();
             for (Calle interseccion : c.inter){
-                id_calle = Integer.parseInt(interseccion.nombre.substring(interseccion.nombre.length() - 1)) - 1;
-                intersecciones.add(calles[id_calle]);
+                //id_calle = Integer.parseInt(interseccion.nombre.substring(interseccion.nombre.length() - 1)) - 1;
+                //intersecciones.add(calles[id_calle]);
+                intersecciones.add(calles.get(interseccion.nombre));
             }
             c.inter = intersecciones;
 
             ArrayList<Semaforo> lista_semaforos = new ArrayList<>();    //correcta apuntando bien
             for (Semaforo semaforo : c.semaforos){
-                int id_semaforo = Integer.parseInt(semaforo.nombre.substring(semaforo.nombre.length() - 1)) - 1;
-                lista_semaforos.add(semaforos[id_semaforo]);
+                //int id_semaforo = Integer.parseInt(semaforo.nombre.substring(semaforo.nombre.length() - 1)) - 1;
+                //lista_semaforos.add(semaforos[id_semaforo]);
+                lista_semaforos.add(semaforos.get(semaforo.nombre));
             }
             c.semaforos = lista_semaforos;
         }
 
-        for (int i = 0; i < vehiculos.length; i++) {
-            System.out.println(vehiculos[i].nombre + ":");
-            System.out.println("  Calle: " + vehiculos[i].calleActual.nombre);
-            System.out.println("  Pos : " + vehiculos[i].pos_x + ", " + vehiculos[i].pos_y);
-            System.out.println("  Obj : " + vehiculos[i].obj_x + ", " + vehiculos[i].obj_y);
-            System.out.println("  Vel : " + vehiculos[i].velocidad);
-            Object[] args = new Object[3];
+        for (Vehiculo v : vehiculos.values()) {
+            System.out.println(v.nombre + ":");
+            System.out.println("  Calle: " + v.calleActual.nombre);
+            System.out.println("  Pos : " + v.pos_x + ", " + v.pos_y);
+            System.out.println("  Obj : " + v.obj_x + ", " + v.obj_y);
+            System.out.println("  Vel : " + v.velocidad);
+            Object[] args = new Object[1];
 
             //String nombre_calle = vehiculos[i].calleActual.nombre;
 
 
-            int id_calle = Integer.parseInt(vehiculos[i].calleActual.nombre.substring(vehiculos[i].calleActual.nombre.length() - 1)) - 1;
-            vehiculos[i].calleActual = calles[id_calle];
+            //int id_calle = Integer.parseInt(vehiculos[i].calleActual.nombre.substring(vehiculos[i].calleActual.nombre.length() - 1)) - 1;
+            //vehiculos[i].calleActual = calles[id_calle];
+            v.calleActual = calles.get(v.calleActual.nombre);
             
-            vehiculos[i].calleActual.vehiculos.put(vehiculos[i].nombre, vehiculos[i]);
+            //vehiculos[i].calleActual.vehiculos.put(vehiculos[i].nombre, vehiculos[i]);
+            v.calleActual.vehiculos.put(v.nombre, v);
 
-            vehiculos[i].ID = i;
+            //vehiculos[i].ID = i;
 
-            args[0] = i; //id vehiculo... se podria obtener deel nombre...
-            args[1] = vehiculos[i];
+            //args[0] = i; //id vehiculo... se podria obtener deel nombre...
+            args[0] = v;
             //args[2] = calles[id_calle];
 
-            AgentController ac = cc.createNewAgent(vehiculos[i].nombre, "org.upc.edu.Behaviours.VehiculoAgent", args);
+            AgentController ac = cc.createNewAgent(v.nombre, "org.upc.edu.Behaviours.VehiculoAgent", args);
             ac.start();
         }
     }
@@ -219,10 +228,10 @@ public class EntornoAgent extends Agent {
         public void onTick() {
 
             System.out.println(" "); // print vector de info 
-            for (Vehiculo v : vehiculos){
+            for (Vehiculo v : vehiculos.values()){
                 System.out.println("["+v.nombre + "] pos = (" + v.pos_x + "," + v.pos_y + ") velocidad=" + v.velocidad);
             }
-            for (Semaforo s : semaforos){
+            for (Semaforo s : semaforos.values()){
                 System.out.println("["+s.nombre + "] calleCerrada: " + s.calleCerrada);
             }
 
@@ -230,20 +239,40 @@ public class EntornoAgent extends Agent {
                 for (int j = 0; j <= 10; j++) {
                     int v = buscaVehiculos(i,j);
                     int s = buscaSemaforo(i,j);
-                    int o = buscaObjetivo(i,j);
-                    if(v != -1) {
-                        String color = String.format("\u001b[3%dm", v+3);
-                        
-                        System.out.print(color + (v+1) + "\u001b[0m" + " ");
+
+                    String reset = "\u001b[0m";
+                    String green = "\u001b[32m";
+                    String red = "\u001b[31m";
+                    String yellow = "\u001b[33m";
+
+                    if (v != -1) {
+                        if (v == 1) {
+
+                            if (s == 0){
+                                System.out.print(red + "■" + reset + " ");
+                            }
+                            else if (s == 1) {
+                                System.out.print(green + "■" + reset + " ");
+                            }
+                            else if (s == 2) {
+                                System.out.print(yellow + "■" + reset + " ");
+                            }
+                            else System.out.print("■" + reset + " ");
+
+                        }
+                    
+                        else if (v == 2) {
+                            String color = String.format("\u001b[3%dm", 5);
+                            System.out.print(color + "☒" + reset + " ");
+                        }
                     }
+
                     else if (s != -1) {
-                        if (s == 0) System.out.print("\u001b[31m"+"◉" + "\u001b[0m" + " ");
-                        else if (s == 1) System.out.print("\u001b[32m" + "◉" + "\u001b[0m"+  " ");
+                        if (s == 0) System.out.print(red +"◉" + reset + " ");
+                        else if (s == 1) System.out.print(green + "◉" + reset +  " ");
+                        else if (s == 2) System.out.print(yellow + "◉" + reset +  " ");
                     }
-                    else if (o != -1) {
-                        String color = String.format("\u001b[3%dm", o+3);
-                        System.out.print(color + "▴" + "\u001b[0m" + " ");
-                    }
+
                     else if(i==0 || i==5 || i==10 || j==0 || j==5 || j==10) System.out.print("· ");
                     else System.out.print("  ");
                 }
@@ -258,11 +287,13 @@ public class EntornoAgent extends Agent {
     public int buscaVehiculos(int i, int j) {
         int n = -1;
         boolean found = false;
-        for (Vehiculo v: vehiculos) {
+        for (Vehiculo v: vehiculos.values()) {
             if (v.pos_x == j && v.pos_y == i) {
-                if (found) System.out.println("ERROOOOOOOOORRRR");
+                if (found) {
+                    n = 2;
+                }
                 else {
-                    n = v.ID;
+                    n = 1;
                     found = true;
                 }
             }
@@ -272,7 +303,7 @@ public class EntornoAgent extends Agent {
 
     public int buscaObjetivo(int i, int j) {
         int n = -1;
-        for (Vehiculo v: vehiculos) {
+        for (Vehiculo v: vehiculos.values()) {
             if (v.obj_x == j && v.obj_y == i) {
                 n = v.ID;
             }
@@ -282,7 +313,7 @@ public class EntornoAgent extends Agent {
 
     public int buscaSemaforo(int i, int j) {
         int n = -1;
-        for (Semaforo s: semaforos) {
+        for (Semaforo s: semaforos.values()) {
             int dir_x = s.calle1.dir_x;
             int dir_y = s.calle1.dir_y;
 
@@ -293,13 +324,19 @@ public class EntornoAgent extends Agent {
                 if (s.calleCerrada.equals(s.calle1.nombre)){
                     n = 0;
                 }
-                else n = 1;
+                else {
+                    if (s.pausa) n = 2;
+                    else n = 1;
+                }
             }
             else if ( (j + dir_x_2)==s.pos_x && (i + dir_y_2)==s.pos_y ) {
                 if (s.calleCerrada.equals(s.calle2.nombre)){
                     n = 0;
                 }
-                else n = 1;
+                else {
+                    if (s.pausa) n = 2;
+                    else n = 1;
+                }
             }
         }
         return n;
@@ -330,44 +367,6 @@ public class EntornoAgent extends Agent {
         }
         // FIN REGISTRO DF
 
-
-        // ya no haria falta, todo con punteros
-        /* MessageTemplate mt = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_QUERY);
-        this.addBehaviour(new AchieveREResponder(this, mt) {
-            protected ACLMessage prepareResultNotification(ACLMessage request, ACLMessage response) {
-
-                // 2 posibilities (accident, nextobstacle)
-                String[] contentArray = request.getContent().split(",");
-                int elID = Integer.parseInt(contentArray[1]);
-
-                // al ser por referencia ya deberia modificarse
-                vehiculos[elID].pos_x = Integer.parseInt(contentArray[2]);
-                vehiculos[elID].pos_y = Integer.parseInt(contentArray[3]);
-                vehiculos[elID].velocidad = Integer.parseInt(contentArray[4]);
-
-                // buscar vehiculo mas cercano en la calle actual
-                String calleActual = vehiculos[elID].calle_actual;
-                int pos_x = vehiculos[elID].pos_x;
-                int pos_y = vehiculos[elID].pos_y;
-
-                for (Vehiculo v : vehiculos){
-                    if (v.calle_actual.equal(calleActual) ){
-                        int dist = (v.pos_x - pos_x)*
-                    }
-                }
-
-
-                // devuelve veehiculo mas cercano, y luz del semaforo
-
-                ACLMessage informDone  = request.createReply();
-                informDone.setPerformative(ACLMessage.INFORM);
-                informDone.setContent("mensaje para ..." + request.getSender().getName());
-                return informDone;
-            }
-            protected ACLMessage handleRequest(ACLMessage request) {
-                return null;
-            }
-        }); */
 
         EntornoTickerBehaviour b = new EntornoTickerBehaviour(this, 300);
         this.addBehaviour(b);

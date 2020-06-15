@@ -20,6 +20,8 @@ import jade.proto.AchieveREResponder;
 import jade.proto.ContractNetResponder;
 import org.apache.jena.base.Sys;
 
+import java.util.concurrent.TimeUnit;
+
 /**
  * @author igomez
  */
@@ -76,14 +78,14 @@ public class SemaforoAgent extends Agent {
         }
 
 
-        int proposedWaitingTime;
+        int proposedWaitingTime = 0;
 
-        if (miSemaforo.tiempoEstadoActual >= 3) {
+        /*if (miSemaforo.tiempoEstadoActual >= 1) {
             proposedWaitingTime = 0;
         }
         else {
-            proposedWaitingTime = 3 - miSemaforo.tiempoEstadoActual;
-        }
+            proposedWaitingTime = 1 - miSemaforo.tiempoEstadoActual;
+        }*/
 
 
         int n_cA = 0;
@@ -201,6 +203,15 @@ public class SemaforoAgent extends Agent {
         }
 
         public void onWake() {
+
+            miSemaforo.pausa = true;
+            //this.block(3000);
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            miSemaforo.pausa = false;
             if (miSemaforo.calleCerrada.equals(miSemaforo.calle1.nombre)) miSemaforo.calleCerrada = miSemaforo.calle2.nombre;
             else miSemaforo.calleCerrada = miSemaforo.calle1.nombre;
             miSemaforo.tiempoEstadoActual = 0;
@@ -249,9 +260,9 @@ public class SemaforoAgent extends Agent {
     protected void setup() {
 
         Object[] args = getArguments();
-        myID = (Integer) args[0];
+        //myID = (Integer) args[0];
 
-        miSemaforo = (EntornoAgent.Semaforo) args[1];
+        miSemaforo = (EntornoAgent.Semaforo) args[0];
         //calle1 = (EntornoAgent.Calle) args[2];
         //calle2 = (EntornoAgent.Calle) args[3];
         //calleCerrada = (String) args[4];

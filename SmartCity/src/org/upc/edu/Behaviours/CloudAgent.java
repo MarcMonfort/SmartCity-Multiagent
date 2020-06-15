@@ -22,6 +22,7 @@ import org.apache.jena.base.Sys;
 
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.Vector;
 
 //import static jade.lang.acl.MessageTemplate.MatchPerformative;
@@ -31,7 +32,7 @@ import java.util.Vector;
  */
 public class CloudAgent extends Agent {
 
-    EntornoAgent.Semaforo[] semaforos;
+    private HashMap<String, EntornoAgent.Semaforo> semaforos;
     AID semaforoSender;
     boolean respuestaPendiente;
     boolean negociacionEnCurso = false;
@@ -64,7 +65,7 @@ public class CloudAgent extends Agent {
         }*/
 
         protected void handleAllResponses(Vector responses, Vector acceptances) {
-            int nResponders = semaforos.length - 1;
+            int nResponders = semaforos.size() - 1;
             int maxTime = minTiempoRequested;
             AID bestProposer = null;
 
@@ -130,7 +131,7 @@ public class CloudAgent extends Agent {
     protected void setup() {
 
         Object[] args = getArguments();
-        semaforos = (EntornoAgent.Semaforo[]) args[0];
+        semaforos = (HashMap<String, EntornoAgent.Semaforo>) args[0];
 
 
         // REGISTRO DF
@@ -169,9 +170,9 @@ public class CloudAgent extends Agent {
 
                     // Create the CFP message
                     ACLMessage msg = new ACLMessage(ACLMessage.CFP);
-                    for (int i = 0; i < semaforos.length; ++i) {
-                        if (!semaforos[i].nombre.equals(semaforoSender.getLocalName())) {
-                            msg.addReceiver(new AID(semaforos[i].nombre, AID.ISLOCALNAME));
+                    for (EntornoAgent.Semaforo s : semaforos.values()) {
+                        if (!s.nombre.equals(semaforoSender.getLocalName())) {
+                            msg.addReceiver(new AID(s.nombre, AID.ISLOCALNAME));
                         }
                     }
                     //msg.removeReceiver(semaforoSender); //se envia a todos menos al sender

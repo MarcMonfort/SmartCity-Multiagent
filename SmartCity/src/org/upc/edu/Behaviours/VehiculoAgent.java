@@ -48,8 +48,8 @@ public class VehiculoAgent extends Agent {
 
         public void onTick() {
 
-            miVehiculo.pos_x += miVehiculo.velocidad * miVehiculo.calleActual.dir_x;
-            miVehiculo.pos_y += miVehiculo.velocidad * miVehiculo.calleActual.dir_y;
+            /* miVehiculo.pos_x += miVehiculo.velocidad * miVehiculo.calleActual.dir_x;
+            miVehiculo.pos_y += miVehiculo.velocidad * miVehiculo.calleActual.dir_y; */
 
             //llegado al destino
             if (miVehiculo.pos_x == miVehiculo.obj_x && miVehiculo.pos_y == miVehiculo.obj_y){
@@ -67,30 +67,7 @@ public class VehiculoAgent extends Agent {
             }
 
 
-            // busca vehiculo mas cercano
-            distVehiculoCarcano = miVehiculo.calleActual.longitud;
-            for (EntornoAgent.Vehiculo v : miVehiculo.calleActual.vehiculos.values()) {
-                if (v != miVehiculo) {
-                    //siempre misma calle
-                    int dist = (v.pos_x - miVehiculo.pos_x) + (v.pos_y - miVehiculo.pos_y);
-                    dist = dist * (miVehiculo.calleActual.dir_x + miVehiculo.calleActual.dir_y);
-                    if ( dist >= 0 && dist < distVehiculoCarcano ){
-                        distVehiculoCarcano = dist;
-                    }
-                }
-            }
-            if (distVehiculoCarcano == 1) { // tanto si es otro vehiculo
-                //System.out.println(miVehiculo.nombre + "  va a chocar...");
-                miVehiculo.velocidad = 0;
-                // esperas o envias mensaje
-            }
-            else if (distVehiculoCarcano == 0) {
-                System.out.println(miVehiculo.nombre + "  ACCIDENTE!!!");
-                miVehiculo.velocidad = 0;
-            }
-            else {
-                miVehiculo.velocidad = 1;
-            }
+            
 
 
             //final calle
@@ -111,10 +88,15 @@ public class VehiculoAgent extends Agent {
 
                     boolean cambiar = (calle_inter.ini_x - miVehiculo.obj_x) * calle_inter.dir_y + (calle_inter.ini_y - miVehiculo.obj_y) * calle_inter.dir_x == 0;
                     
-                    /* if (!cambiar){
+                    if (!cambiar){
                         Random rand = new Random();
-                        cambiar = rand.nextBoolean();
-                    } */
+                        //cambiar = rand.nextBoolean();
+                        //cambiar = rand.nextInt(3);
+                        int r = rand.nextInt(3);
+                        if (r == 0) {
+                            cambiar = true;
+                        }
+                    }
 
                     if (cambiar) {
                         miVehiculo.calleActual.vehiculos.remove(miVehiculo.nombre);
@@ -124,11 +106,76 @@ public class VehiculoAgent extends Agent {
                 }
             }
 
+
+            // busca vehiculo mas cercano
+            distVehiculoCarcano = miVehiculo.calleActual.longitud;
+            try {
+                for (EntornoAgent.Vehiculo v : miVehiculo.calleActual.vehiculos.values()) {
+                    if (v != miVehiculo) {
+                        //siempre misma calle
+                        int dist = (v.pos_x - miVehiculo.pos_x) + (v.pos_y - miVehiculo.pos_y);
+                        dist = dist * (miVehiculo.calleActual.dir_x + miVehiculo.calleActual.dir_y);
+                        if ( dist >= 0 && dist < distVehiculoCarcano ){
+                            distVehiculoCarcano = dist;
+                        }
+                    }
+                }
+                for (EntornoAgent.Vehiculo v : miVehiculo.calleActual.siguiente.vehiculos.values()) {
+                    if (v.pos_x == miVehiculo.calleActual.fin_x && v.pos_y == miVehiculo.calleActual.fin_y){
+                        int dist = (v.pos_x - miVehiculo.pos_x) + (v.pos_y - miVehiculo.pos_y);
+                        dist = dist * (miVehiculo.calleActual.dir_x + miVehiculo.calleActual.dir_y);
+                        //System.out.println(miVehiculo.nombre + "         *****    " + dist);
+                        //distVehiculoCarcano = dist;
+                        if ( dist >= 0 && dist < distVehiculoCarcano ){
+                            distVehiculoCarcano = dist;
+                        } 
+                    }
+                }
+
+                
+                for (EntornoAgent.Calle calle_inter : miVehiculo.calleActual.inter) {
+                    for (EntornoAgent.Vehiculo v : calle_inter.vehiculos.values()) {
+
+                        if ( v.pos_x == miVehiculo.pos_x+miVehiculo.calleActual.dir_x && v.pos_y == miVehiculo.pos_y+miVehiculo.calleActual.dir_y  ){
+                            distVehiculoCarcano = 1;
+                        }
+
+                    }
+                }               
+
+            }
+            catch(Exception e){
+                distVehiculoCarcano = 1;
+                //System.out.println(" 0000000000000000000000111111111111111111    2222222222222222222222222222222222");
+            }
+            if (distVehiculoCarcano == 1) { // tanto si es otro vehiculo
+                //System.out.println(miVehiculo.nombre + "  va a chocar...");
+                miVehiculo.velocidad = 0;
+                // esperas o envias mensaje
+            }
+            else if (distVehiculoCarcano == 0) {
+                System.out.println(miVehiculo.nombre + "  ACCIDENTE!!!");
+                miVehiculo.velocidad = 0;
+                Random rand = new Random();
+                int reparar = rand.nextInt(7);
+                /* if (reparar == 0) {
+                    miVehiculo.velocidad = 1;
+                } */
+            }
+            else {
+                miVehiculo.velocidad = 1;
+            }
+
+
             // ha llegado a un semaforo
             for (EntornoAgent.Semaforo semaforo : miVehiculo.calleActual.semaforos) {
                 if ((miVehiculo.pos_x+miVehiculo.calleActual.dir_x) == semaforo.pos_x && (miVehiculo.pos_y+miVehiculo.calleActual.dir_y) == semaforo.pos_y){
-                    //esta en rojo
-                    if (miVehiculo.calleActual.nombre.equals(semaforo.calleCerrada)) {
+                    //ambar
+                    if(semaforo.pausa) {
+                        miVehiculo.velocidad = 0;
+                    }
+                    //rojo
+                    else if (miVehiculo.calleActual.nombre.equals(semaforo.calleCerrada)) {
                         miVehiculo.velocidad = 0;
                         if (!semaforoRojoConsultado) {
                             //System.out.println(miVehiculo.nombre + "  Esperando en : " + semaforo.nombre);
@@ -178,42 +225,10 @@ public class VehiculoAgent extends Agent {
                 }
             }
 
-            
 
-            
+            miVehiculo.pos_x += miVehiculo.velocidad * miVehiculo.calleActual.dir_x;
+            miVehiculo.pos_y += miVehiculo.velocidad * miVehiculo.calleActual.dir_y;
 
-
-
-
-            // Establece posicion y recibe next obstacle en cada tick
-            /* if (true) {
-                final DFAgentDescription desc = new DFAgentDescription();
-                final ServiceDescription sdesc = new ServiceDescription();
-                sdesc.setType("Entorno");
-                desc.addServices(sdesc);
-                try {
-                    final DFAgentDescription[] environments = DFService.search(VehiculoAgent.this, getDefaultDF(), desc, new SearchConstraints());
-                    final AID environment = environments[0].getName();
-                    final ACLMessage aclMessage = new ACLMessage(ACLMessage.QUERY_IF);
-
-                    aclMessage.setProtocol(FIPANames.InteractionProtocol.FIPA_QUERY);
-                    aclMessage.setSender(VehiculoAgent.this.getAID());
-                    aclMessage.addReceiver(environment);
-                    aclMessage.setContent("setCar," + myID + "," + miVehiculo.pos_x + "," + miVehiculo.pos_y + "," + miVehiculo.velocidad);
-
-                    myAgent.addBehaviour(new AchieveREInitiator(myAgent, aclMessage) {
-                        protected void handleInform(ACLMessage inform) {
-                            //System.out.println(inform.getContent());
-                            //double t = Double.parseDouble(inform.getContent());
-                            //System.out.println(VehiculoAgent.this.getName() + " == " + inform.getContent()); //
-                            
-                        }
-                    });
-                    
-                } catch (FIPAException e) {
-                    e.printStackTrace();
-                }
-            } */
 
         }
 
@@ -222,9 +237,9 @@ public class VehiculoAgent extends Agent {
     protected void setup() {
 
         Object[] args = getArguments();
-        myID = (Integer) args[0];
+        //myID = (Integer) args[0];
 
-        miVehiculo = (EntornoAgent.Vehiculo) args[1];
+        miVehiculo = (EntornoAgent.Vehiculo) args[0];
 
         miVehiculo.velocidad = 1;
         
