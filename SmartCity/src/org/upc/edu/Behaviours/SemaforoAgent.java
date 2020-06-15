@@ -32,14 +32,7 @@ public class SemaforoAgent extends Agent {
     AID cloudAID;
 
     public int getTiempoEspera() {
-        int proposedWaitingTime;
 
-        if (miSemaforo.tiempoEstadoActual >= 10) {
-            proposedWaitingTime = 0;
-        }
-        else {
-            proposedWaitingTime = 10 - miSemaforo.tiempoEstadoActual;
-        }
 
         EntornoAgent.Calle cC, cA;
         if (miSemaforo.calleCerrada.equals(miSemaforo.calle1.nombre))  {
@@ -82,13 +75,29 @@ public class SemaforoAgent extends Agent {
             fin_y = ini_y + cA.longitud/2;
         }
 
+
+        int proposedWaitingTime;
+
+        if (miSemaforo.tiempoEstadoActual >= 3) {
+            proposedWaitingTime = 0;
+        }
+        else {
+            proposedWaitingTime = 3 - miSemaforo.tiempoEstadoActual;
+        }
+
+
+        int n_cA = 0;
+
         //System.out.println(miSemaforo.nombre + " cA = " + cA.nombre);
         for (EntornoAgent.Vehiculo v : cA.vehiculos.values()){
             if (v.pos_x >= ini_x && v.pos_y >= ini_y &&  v.pos_x <= fin_x && v.pos_y <= fin_y) {
-                proposedWaitingTime++;
+                n_cA++;
                 //System.out.println(miSemaforo.nombre + " cA   " + "    +1 => " + v.nombre);
             }
         }
+
+        if (n_cA == 0) return 0; //Si no hay coches en la calle abierta, al semaforo le da igual cambiar ya
+        else proposedWaitingTime += n_cA;
 
 
         if (cC.dir_x == 1){
@@ -129,10 +138,6 @@ public class SemaforoAgent extends Agent {
     }
 
 
-    private boolean calleAbiertaVacia() {
-        return true;
-    }
-
     private class ContractNetResponderBehaviour extends ContractNetResponder {
 
 
@@ -161,7 +166,7 @@ public class SemaforoAgent extends Agent {
             //System.out.println("Agent '" + getLocalName() + "' accepts proposal and is about to perform an action");
             SemaforoWakerBehaviour b = new SemaforoWakerBehaviour(myAgent, countdown*1000, false);
             myAgent.addBehaviour(b);
-            System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "'");
+            //System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "'");
             ACLMessage inform = accept.createReply();
             inform.setPerformative(ACLMessage.INFORM);
             inform.setContent(String.valueOf(countdown));
@@ -310,7 +315,7 @@ public class SemaforoAgent extends Agent {
                 //System.out.println("Agent '" + getLocalName() + "' recibió countdown del cloud... va a invocar a waker");
                 SemaforoWakerBehaviour b = new SemaforoWakerBehaviour(myAgent, countdown*1000, true);
                 myAgent.addBehaviour(b);
-                System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "' [SENDER]");
+                //System.out.println("Agent '" + getLocalName() + "' : invocado waker, cuenta atras: '" + countdown + "' [SENDER]");
 
                 ACLMessage informDone  = propose.createReply();
                 informDone.setPerformative(ACLMessage.AGREE);
@@ -333,11 +338,13 @@ public class SemaforoAgent extends Agent {
                 int miTiempo = getTiempoEspera();
                 requestCloud.setContent(String.valueOf(miTiempo));
                 //System.out.println("Agent " + myAgent.getLocalName() + "va a llamar a Cloud con tiempo: " + miTiempo);
+                //System.out.println("Agent '" + getLocalName() + "' proposes  '" + miTiempo + "' [SENDER]");
 
                 // Pregunta al cloud para que negocie con los otros semaforos
                 myAgent.addBehaviour(new AchieveREInitiator(myAgent, requestCloud) {
                     protected void handleInform(ACLMessage inform) {
-                        String respuesta = inform.getContent();
+                        //System.out.println(myAgent.getLocalName() + ": recibido => " + inform.getContent());
+
                     }
                 });
                 // Espera a que el cloud le responda

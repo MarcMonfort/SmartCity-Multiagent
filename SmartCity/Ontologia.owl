@@ -1637,7 +1637,7 @@
 
     <owl:NamedIndividual rdf:about="http://www.semanticweb.org/sid/smartCity#Semaforo2">
         <rdf:type rdf:resource="http://www.semanticweb.org/sid/smartCity#AgenteSemaforo"/>
-        <cierraPasoA rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle6"/>
+        <cierraPasoA rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle2"/>
         <ocurreEn rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle2"/>
         <ocurreEn rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle6"/>
         <seComunicaCon rdf:resource="http://www.semanticweb.org/sid/smartCity#CentroDeDatos"/>
@@ -1712,6 +1712,18 @@
         <tienePosicion rdf:datatype="http://www.semanticweb.org/sid/smartCity#coord">10,0</tienePosicion>
         <tieneVelocidad rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</tieneVelocidad>
     </owl:NamedIndividual>
+
+
+
+    <!-- http://www.semanticweb.org/sid/smartCity#Vehiculo4 -->
+
+        <owl:NamedIndividual rdf:about="http://www.semanticweb.org/sid/smartCity#Vehiculo4">
+            <rdf:type rdf:resource="http://www.semanticweb.org/sid/smartCity#AgenteVehiculo"/>
+            <ocurreEn rdf:resource="http://www.semanticweb.org/sid/smartCity#Calle2"/>
+            <tieneObjetivo rdf:datatype="http://www.semanticweb.org/sid/smartCity#coord">10,5</tieneObjetivo>
+            <tienePosicion rdf:datatype="http://www.semanticweb.org/sid/smartCity#coord">0,10</tienePosicion>
+            <tieneVelocidad rdf:datatype="http://www.w3.org/2001/XMLSchema#int">0</tieneVelocidad>
+        </owl:NamedIndividual>
 </rdf:RDF>
 
 

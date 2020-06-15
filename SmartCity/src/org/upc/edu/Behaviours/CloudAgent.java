@@ -159,40 +159,44 @@ public class CloudAgent extends Agent {
                 return null;
             }
             protected ACLMessage handleRequest(ACLMessage request) {
-                semaforoSender = request.getSender();
-                // El tiempo del semaforoSender
-                minTiempoRequested = Integer.parseInt(request.getContent());
-
-                // Create the CFP message
-                ACLMessage msg = new ACLMessage(ACLMessage.CFP);
-                for (int i = 0; i < semaforos.length; ++i) {
-                    if (!semaforos[i].nombre.equals(semaforoSender.getLocalName())) {
-                        msg.addReceiver(new AID(semaforos[i].nombre, AID.ISLOCALNAME));
-                    }
-                }
-                //msg.removeReceiver(semaforoSender); //se envia a todos menos al sender
-
-                msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-                // We want to receive a reply in 10 secs
-                // HACER CON MENOS TIEMPO
-                msg.setReplyByDate(new Date(System.currentTimeMillis() + 1000));
-
-                respuestaPendiente = true;
-                //System.out.println("Cloud empieza ContractNetInitiator!!!");
+                ACLMessage informDone  = request.createReply();
                 if (!negociacionEnCurso) {
+                    negociacionEnCurso = true;
+
+                    semaforoSender = request.getSender();
+                    // El tiempo del semaforoSender
+                    minTiempoRequested = Integer.parseInt(request.getContent());
+
+                    // Create the CFP message
+                    ACLMessage msg = new ACLMessage(ACLMessage.CFP);
+                    for (int i = 0; i < semaforos.length; ++i) {
+                        if (!semaforos[i].nombre.equals(semaforoSender.getLocalName())) {
+                            msg.addReceiver(new AID(semaforos[i].nombre, AID.ISLOCALNAME));
+                        }
+                    }
+                    //msg.removeReceiver(semaforoSender); //se envia a todos menos al sender
+
+                    msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
+                    // We want to receive a reply in 10 secs
+                    // HACER CON MENOS TIEMPO
+                    msg.setReplyByDate(new Date(System.currentTimeMillis() + 1000));
+
+
+                    respuestaPendiente = true;
+                    //System.out.println("Cloud empieza ContractNetInitiator!!!");
+                    informDone.setContent("SI");
+                    //System.out.println("negociacion en curso => " + request.getSender());
                     ContractNetInitiatorBehaviour cib = new ContractNetInitiatorBehaviour(myAgent, msg);
                     addBehaviour(cib);
-                    negociacionEnCurso = true;
                 }
-
-                MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
+                else informDone.setContent("NO");
+                //MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
                 //ACLMessage resultado = myAgent.blockingReceive(mt);
                 //while(!cib.done());
 
                 // Responde al semaforo inicial con el resultado de contract-net
-                ACLMessage informDone  = request.createReply();
                 informDone.setPerformative(ACLMessage.INFORM);
-                informDone.setContent("wait");
+
 
                 return informDone;
             }
