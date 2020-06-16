@@ -3,20 +3,14 @@
  * and open the template in the editor.
  */
 
-package org.upc.edu.Behaviours;
+package Agentes;
 
 import jade.core.Agent;
-import jade.core.behaviours.CyclicBehaviour;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
-import jade.domain.FIPANames;
-import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
-import jade.proto.AchieveREResponder;
-import jade.tools.sniffer.Sniffer;
 import jade.wrapper.AgentController;
 import jade.wrapper.ContainerController;
 import jade.wrapper.StaleProxyException;
@@ -24,9 +18,7 @@ import jade.wrapper.StaleProxyException;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-/**
- * @author igomez
- */
+
 public class EntornoAgent extends Agent {
 
     public static class Calle {
@@ -40,8 +32,8 @@ public class EntornoAgent extends Agent {
         public int dir_y;
         
         public Calle siguiente;
-        public ArrayList<Calle> inter; //null
-        public ArrayList<Semaforo> semaforos; //arrasy list
+        public ArrayList<Calle> inter;
+        public ArrayList<Semaforo> semaforos;
 
         public HashMap<String, Vehiculo> vehiculos = new HashMap<>();
     }
@@ -54,8 +46,6 @@ public class EntornoAgent extends Agent {
         public int obj_x;
         public int obj_y;
         public int velocidad;
-        //public String calle_actual;
-
         public Calle calleActual;
     }
 
@@ -63,8 +53,6 @@ public class EntornoAgent extends Agent {
         public String nombre;
         public int pos_x;
         public int pos_y;
-        //public String calle1;
-        //public String calle2;
         public String calleCerrada; //calle1 o calle2
         public int tiempoEstadoActual;
 
@@ -83,13 +71,6 @@ public class EntornoAgent extends Agent {
         return coord;
     }
 
-    //private ArrayList<Vehiculo> info_vehiculos;
-
-    //private HashMap<String, Vehiculo> info_vehiculos = new HashMap<>();
-    /* private Calle[] calles;
-    private Vehiculo[] vehiculos;
-    private Semaforo[] semaforos; */
-
     private HashMap<String, Calle> calles;
     private HashMap<String, Vehiculo> vehiculos;
     private HashMap<String, Semaforo> semaforos;
@@ -107,6 +88,7 @@ public class EntornoAgent extends Agent {
         System.out.println("Ontology loaded");
 
         ContainerController cc = getContainerController();
+
         //AgentController sniffer = cc.createNewAgent("Sniffer", Sniffer.class.getName(), null);
         //sniffer.start();
         //System.out.println("Sniffer started");
@@ -136,27 +118,20 @@ public class EntornoAgent extends Agent {
             System.out.println("  CalleCerrada : " + s.calleCerrada);
             Object[] args = new Object[1];
 
-            //String nombre_calle1 = s.calle1.nombre;
-            //String nombre_calle2 = s.calle2.nombre;
-
-            //int id_calle1 = Integer.parseInt(nombre_calle1.substring(nombre_calle1.length() - 1)) - 1;
-            //int id_calle2 = Integer.parseInt(nombre_calle2.substring(nombre_calle2.length() - 1)) - 1;
-
 
             s.calle1 = calles.get(s.calle1.nombre);
             s.calle2 = calles.get(s.calle2.nombre);
 
             args[0] = s;
 
-            AgentController ac = cc.createNewAgent(s.nombre, "org.upc.edu.Behaviours.SemaforoAgent", args);
+            AgentController ac = cc.createNewAgent(s.nombre, "Agentes.SemaforoAgent", args);
             ac.start();
         }
 
         {
             Object[] args = new Object[1];
             args[0] = semaforos;
-            //args[1] = calles
-            AgentController ac = cc.createNewAgent("CentroDeDatos", "org.upc.edu.Behaviours.CloudAgent", args);
+            AgentController ac = cc.createNewAgent("CentroDeDatos", "Agentes.CloudAgent", args);
             ac.start();
         }
 
@@ -164,25 +139,18 @@ public class EntornoAgent extends Agent {
         System.out.println("INSTANCIAS DE VEHICULOS:");
         vehiculos = parser.getVehiculos();
 
-        // crea objetos calle siguiente i calle interseccion (actuan como punteros)
         for (Calle c : calles.values()) { //relaciona calles con calles
 
-            //int id_calle = Integer.parseInt(c.siguiente.nombre.substring(c.siguiente.nombre.length() - 1)) - 1;
-            //c.siguiente = calles[id_calle];
             c.siguiente = calles.get(c.siguiente.nombre);
 
             ArrayList<Calle> intersecciones = new ArrayList<>();
             for (Calle interseccion : c.inter){
-                //id_calle = Integer.parseInt(interseccion.nombre.substring(interseccion.nombre.length() - 1)) - 1;
-                //intersecciones.add(calles[id_calle]);
                 intersecciones.add(calles.get(interseccion.nombre));
             }
             c.inter = intersecciones;
 
-            ArrayList<Semaforo> lista_semaforos = new ArrayList<>();    //correcta apuntando bien
+            ArrayList<Semaforo> lista_semaforos = new ArrayList<>();   
             for (Semaforo semaforo : c.semaforos){
-                //int id_semaforo = Integer.parseInt(semaforo.nombre.substring(semaforo.nombre.length() - 1)) - 1;
-                //lista_semaforos.add(semaforos[id_semaforo]);
                 lista_semaforos.add(semaforos.get(semaforo.nombre));
             }
             c.semaforos = lista_semaforos;
@@ -196,30 +164,16 @@ public class EntornoAgent extends Agent {
             System.out.println("  Vel : " + v.velocidad);
             Object[] args = new Object[1];
 
-            //String nombre_calle = vehiculos[i].calleActual.nombre;
-
-
-            //int id_calle = Integer.parseInt(vehiculos[i].calleActual.nombre.substring(vehiculos[i].calleActual.nombre.length() - 1)) - 1;
-            //vehiculos[i].calleActual = calles[id_calle];
             v.calleActual = calles.get(v.calleActual.nombre);
-            
-            //vehiculos[i].calleActual.vehiculos.put(vehiculos[i].nombre, vehiculos[i]);
             v.calleActual.vehiculos.put(v.nombre, v);
-
-            //vehiculos[i].ID = i;
-
-            //args[0] = i; //id vehiculo... se podria obtener deel nombre...
             args[0] = v;
-            //args[2] = calles[id_calle];
 
-            AgentController ac = cc.createNewAgent(v.nombre, "org.upc.edu.Behaviours.VehiculoAgent", args);
+            AgentController ac = cc.createNewAgent(v.nombre, "Agentes.VehiculoAgent", args);
             ac.start();
         }
     }
 
     public class EntornoTickerBehaviour extends TickerBehaviour {
-
-        ACLMessage msg;
 
         public EntornoTickerBehaviour(Agent a, long period) {
             super(a, period);
@@ -227,7 +181,8 @@ public class EntornoAgent extends Agent {
 
         public void onTick() {
 
-            System.out.println(" "); // print vector de info 
+            //muestra información por pantalla
+            System.out.println(" ");
             for (Vehiculo v : vehiculos.values()){
                 System.out.println("["+v.nombre + "] pos = (" + v.pos_x + "," + v.pos_y + ") velocidad=" + v.velocidad);
             }
@@ -244,10 +199,10 @@ public class EntornoAgent extends Agent {
                     String green = "\u001b[32m";
                     String red = "\u001b[31m";
                     String yellow = "\u001b[33m";
+                    String magenta = "\u001b[35m";
 
                     if (v != -1) {
                         if (v == 1) {
-
                             if (s == 0){
                                 System.out.print(red + "■" + reset + " ");
                             }
@@ -258,12 +213,9 @@ public class EntornoAgent extends Agent {
                                 System.out.print(yellow + "■" + reset + " ");
                             }
                             else System.out.print("■" + reset + " ");
-
                         }
-                    
                         else if (v == 2) {
-                            String color = String.format("\u001b[3%dm", 5);
-                            System.out.print(color + "☒" + reset + " ");
+                            System.out.print(magenta + "☒" + reset + " ");
                         }
                     }
 

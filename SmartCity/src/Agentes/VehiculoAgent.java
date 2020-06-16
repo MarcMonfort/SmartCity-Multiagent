@@ -3,19 +3,17 @@
  * and open the template in the editor.
  */
 
-package org.upc.edu.Behaviours;
+package Agentes;
 
 import jade.core.AID;
 import jade.core.Agent;
 import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
-import jade.domain.FIPAAgentManagement.SearchConstraints;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
 import jade.domain.FIPAException;
 import jade.domain.FIPANames;
 import jade.lang.acl.ACLMessage;
-import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREInitiator;
 
 import java.util.Random;
@@ -26,20 +24,15 @@ import java.util.Random;
 public class VehiculoAgent extends Agent {
 
 
-    String vID;
 
     int distVehiculoCarcano;
 
     EntornoAgent.Vehiculo miVehiculo;
-    //EntornoAgent.Calle miVehiculo.calleActual; // voy a suponer que sabe en que calle esta
-    int myID;
 
     boolean semaforoRojoConsultado; // sirve para no consultar otra vez mientras espera a que se ponga verde
 
 
     public class VehiculoTickerBehaviour extends TickerBehaviour {
-
-        //ACLMessage msg;
 
         public VehiculoTickerBehaviour(Agent a, long period) {
             super(a, period);
@@ -48,21 +41,17 @@ public class VehiculoAgent extends Agent {
 
         public void onTick() {
 
-            /* miVehiculo.pos_x += miVehiculo.velocidad * miVehiculo.calleActual.dir_x;
-            miVehiculo.pos_y += miVehiculo.velocidad * miVehiculo.calleActual.dir_y; */
 
-            //llegado al destino
+            //ha llegado al destino
             if (miVehiculo.pos_x == miVehiculo.obj_x && miVehiculo.pos_y == miVehiculo.obj_y){
                 //miVehiculo.velocidad = 0;
                 //System.out.println(miVehiculo.nombre + ": DESTINO!!!");
-                //hacer un pause(3 segundos)...
                 // nuevo objetivo
                 Random rand = new Random();
                 miVehiculo.obj_x = rand.nextInt(3) * 5;
                 miVehiculo.obj_y = rand.nextInt(3) * 5;
 
                 //System.out.println(miVehiculo.nombre + ": Nuevo Objetivo (" + miVehiculo.obj_x +","+miVehiculo.obj_y+")");
-
                 //miVehiculo.velocidad = 1;
             }
 
@@ -73,7 +62,6 @@ public class VehiculoAgent extends Agent {
             //final calle
             if (miVehiculo.pos_x == miVehiculo.calleActual.fin_x && miVehiculo.pos_y == miVehiculo.calleActual.fin_y){
                 //System.out.println(miVehiculo.nombre + "  Ha llegado al final de la calle");
-
                 miVehiculo.calleActual.vehiculos.remove(miVehiculo.nombre);
                 miVehiculo.calleActual = miVehiculo.calleActual.siguiente;
                 miVehiculo.calleActual.vehiculos.put(miVehiculo.nombre, miVehiculo);
@@ -85,13 +73,11 @@ public class VehiculoAgent extends Agent {
                 if (((miVehiculo.pos_x - calle_inter.ini_x) * miVehiculo.calleActual.dir_x + (miVehiculo.pos_y - calle_inter.ini_y) * miVehiculo.calleActual.dir_y)==0) {
                     //System.out.println(miVehiculo.nombre + "  Estoy en una interseccioin");
 
-
                     boolean cambiar = (calle_inter.ini_x - miVehiculo.obj_x) * calle_inter.dir_y + (calle_inter.ini_y - miVehiculo.obj_y) * calle_inter.dir_x == 0;
-                    
+
+                    // reduce el flujo en ciertas calles
                     if (!cambiar){
                         Random rand = new Random();
-                        //cambiar = rand.nextBoolean();
-                        //cambiar = rand.nextInt(3);
                         int r = rand.nextInt(3);
                         if (r == 0) {
                             cambiar = true;
@@ -124,15 +110,11 @@ public class VehiculoAgent extends Agent {
                     if (v.pos_x == miVehiculo.calleActual.fin_x && v.pos_y == miVehiculo.calleActual.fin_y){
                         int dist = (v.pos_x - miVehiculo.pos_x) + (v.pos_y - miVehiculo.pos_y);
                         dist = dist * (miVehiculo.calleActual.dir_x + miVehiculo.calleActual.dir_y);
-                        //System.out.println(miVehiculo.nombre + "         *****    " + dist);
-                        //distVehiculoCarcano = dist;
                         if ( dist >= 0 && dist < distVehiculoCarcano ){
                             distVehiculoCarcano = dist;
                         } 
                     }
                 }
-
-                
                 for (EntornoAgent.Calle calle_inter : miVehiculo.calleActual.inter) {
                     for (EntornoAgent.Vehiculo v : calle_inter.vehiculos.values()) {
 
@@ -145,22 +127,21 @@ public class VehiculoAgent extends Agent {
 
             }
             catch(Exception e){
+                // problemas de concurrencia
                 distVehiculoCarcano = 1;
-                //System.out.println(" 0000000000000000000000111111111111111111    2222222222222222222222222222222222");
             }
-            if (distVehiculoCarcano == 1) { // tanto si es otro vehiculo
-                //System.out.println(miVehiculo.nombre + "  va a chocar...");
+            // demasiado cerca
+            if (distVehiculoCarcano == 1) {
                 miVehiculo.velocidad = 0;
-                // esperas o envias mensaje
             }
             else if (distVehiculoCarcano == 0) {
                 System.out.println(miVehiculo.nombre + "  ACCIDENTE!!!");
                 miVehiculo.velocidad = 0;
                 Random rand = new Random();
                 int reparar = rand.nextInt(7);
-                /* if (reparar == 0) {
+                if (reparar == 0) {
                     miVehiculo.velocidad = 1;
-                } */
+                }
             }
             else {
                 miVehiculo.velocidad = 1;
@@ -237,7 +218,6 @@ public class VehiculoAgent extends Agent {
     protected void setup() {
 
         Object[] args = getArguments();
-        //myID = (Integer) args[0];
 
         miVehiculo = (EntornoAgent.Vehiculo) args[0];
 

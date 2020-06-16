@@ -1,6 +1,5 @@
-package org.upc.edu.Behaviours;
+package Agentes;
 
-import org.apache.jena.base.Sys;
 import org.apache.jena.ontology.*;
 import org.apache.jena.query.*;
 import org.apache.jena.rdf.model.*;
@@ -78,9 +77,6 @@ public class OntologyParser {
             semaforo.calle1 = calle1;
             semaforo.calle2 = calle2;
 
-            //semaforos[i].calle1 = it.next().asResource().getLocalName();
-            //semaforos[i].calle2 = it.next().asResource().getLocalName();
-
             semaforo.calleCerrada = indiv.getPropertyValue(cierraPasoA).asResource().getLocalName();
 
             list_semaforos.put(semaforo.nombre, semaforo);
@@ -91,34 +87,6 @@ public class OntologyParser {
 
 
     }
-
-    /* public EntornoAgent.Semaforo getSemaforo(String nombre) {
-        Individual indiv;
-
-        String url = "http://www.semanticweb.org/sid/smartCity#" + nombre;
-        indiv = model.getIndividual(url);
-
-        Property tienePosicion  = model.getDatatypeProperty("http://www.semanticweb.org/sid/smartCity#tienePosicion");
-        Property cierraPasoA  = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#cierraPasoA");
-        Property ocurreEn  = model.getObjectProperty("http://www.semanticweb.org/sid/smartCity#ocurreEn");
-
-        EntornoAgent.Semaforo semaforo = new EntornoAgent.Semaforo();
-
-        semaforo.nombre = indiv.getLocalName();
-
-        int[] pos = EntornoAgent.getCoord(indiv.getPropertyValue(tienePosicion).asLiteral().getString());
-        semaforo.pos_x = pos[0];
-        semaforo.pos_y = pos[1];
-
-        NodeIterator it = indiv.listPropertyValues(ocurreEn);
-        semaforo.calle1 = it.next().asResource().getLocalName();
-        semaforo.calle2 = it.next().asResource().getLocalName();
-
-        semaforo.calleCerrada = indiv.getPropertyValue(cierraPasoA).asResource().getLocalName();
-        return semaforo;
-    } */
-
-
 
 
     public HashMap<String, EntornoAgent.Calle> getCalles() {
@@ -170,7 +138,6 @@ public class OntologyParser {
             calle.dir_x = direccion[0];
             calle.dir_y = direccion[1];
 
-            //NUEVO
             ArrayList<EntornoAgent.Semaforo> semaforos = new ArrayList<>();
             NodeIterator it = indiv.listPropertyValues(contiene);
             while (it.hasNext()) {
@@ -246,7 +213,6 @@ public class OntologyParser {
             EntornoAgent.Calle calleActual = new EntornoAgent.Calle();
             calleActual.nombre = indiv.getPropertyValue(ocurreEn).asResource().getLocalName();
             vehiculo.calleActual = calleActual;
-            //vehiculos[i].calle_actual = indiv_vehiculos[i].getPropertyValue(ocurreEn).asResource().getLocalName();
 
             list_vehiculos.put(vehiculo.nombre, vehiculo);
 

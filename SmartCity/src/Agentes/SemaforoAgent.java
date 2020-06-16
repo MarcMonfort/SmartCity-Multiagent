@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.upc.edu.Behaviours;
+package Agentes;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -18,19 +18,13 @@ import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
 import jade.proto.ContractNetResponder;
-import org.apache.jena.base.Sys;
 
 import java.util.concurrent.TimeUnit;
 
-/**
- * @author igomez
- */
+
 public class SemaforoAgent extends Agent {
 
     EntornoAgent.Semaforo miSemaforo;
-
-    int myID;
-
     AID cloudAID;
 
     public int getTiempoEspera() {
@@ -80,21 +74,20 @@ public class SemaforoAgent extends Agent {
 
         int proposedWaitingTime = 0;
 
-        /*if (miSemaforo.tiempoEstadoActual >= 1) {
+        // Esto añade un tiempo mínimo de espera de 3 segundos
+        /*if (miSemaforo.tiempoEstadoActual >= 3) {
             proposedWaitingTime = 0;
         }
         else {
-            proposedWaitingTime = 1 - miSemaforo.tiempoEstadoActual;
+            proposedWaitingTime = 3 - miSemaforo.tiempoEstadoActual;
         }*/
 
 
         int n_cA = 0;
 
-        //System.out.println(miSemaforo.nombre + " cA = " + cA.nombre);
         for (EntornoAgent.Vehiculo v : cA.vehiculos.values()){
             if (v.pos_x >= ini_x && v.pos_y >= ini_y &&  v.pos_x <= fin_x && v.pos_y <= fin_y) {
                 n_cA++;
-                //System.out.println(miSemaforo.nombre + " cA   " + "    +1 => " + v.nombre);
             }
         }
 
@@ -127,11 +120,9 @@ public class SemaforoAgent extends Agent {
             fin_y = ini_y + cC.longitud/2;
         }
 
-        //System.out.println(miSemaforo.nombre + " cC = " + cC.nombre);
         for (EntornoAgent.Vehiculo v : cC.vehiculos.values()){
             if (v.pos_x >= ini_x && v.pos_y >= ini_y &&  v.pos_x <= fin_x && v.pos_y <= fin_y) {
                 proposedWaitingTime--;
-                //System.out.println(miSemaforo.nombre + " cC   " + "    -1 => " + v.nombre);
             }
         }
 
@@ -162,7 +153,7 @@ public class SemaforoAgent extends Agent {
 
         }
 
-        // aqui invocar al waker (si tiempo > 0, sino cambia directamente de calle)
+        // Invocar al waker con el tiempo decidido en contract-net
         protected ACLMessage handleAcceptProposal(ACLMessage cfp, ACLMessage propose, ACLMessage accept) throws FailureException {
             int countdown = Integer.parseInt(accept.getContent());
             //System.out.println("Agent '" + getLocalName() + "' accepts proposal and is about to perform an action");
@@ -205,7 +196,6 @@ public class SemaforoAgent extends Agent {
         public void onWake() {
 
             miSemaforo.pausa = true;
-            //this.block(3000);
             try {
                 TimeUnit.SECONDS.sleep(1);
             } catch (InterruptedException e) {
@@ -231,22 +221,10 @@ public class SemaforoAgent extends Agent {
     
     public class SemaforoTickerBehaviour extends TickerBehaviour {
 
-        //ACLMessage msg;
 
         public SemaforoTickerBehaviour(Agent a, long period) {
             super(a, period);
         }
-
-        /* public void onStart() {
-            msg = new ACLMessage(ACLMessage.INFORM);
-            msg.addReceiver(new AID("Termostato", AID.ISLOCALNAME));
-            msg.setSender(getAID());
-        } */
-
-        /* public int onEnd() {
-            System.out.println("Bye..");
-            return 0;
-        } */
 
         public void onTick() {
             miSemaforo.tiempoEstadoActual += 1;
@@ -260,15 +238,8 @@ public class SemaforoAgent extends Agent {
     protected void setup() {
 
         Object[] args = getArguments();
-        //myID = (Integer) args[0];
 
         miSemaforo = (EntornoAgent.Semaforo) args[0];
-        //calle1 = (EntornoAgent.Calle) args[2];
-        //calle2 = (EntornoAgent.Calle) args[3];
-        //calleCerrada = (String) args[4];
-        //if (calleCerrada.equals(calle1.nombre)) calleAbierta = calle2.nombre;
-        //else calleAbierta = calle1.nombre;
-        //
 
 
         System.out.println("Agent " + this.getLocalName() + " inicial:\n"
@@ -312,16 +283,13 @@ public class SemaforoAgent extends Agent {
         }
 
         // Recibe respuesta de cloud, con el tiempo de espera => invoca waker
-       // MessageTemplate aux = MessageTemplate.not(MessageTemplate.MatchContent("negociacion-finalizada"));
         MessageTemplate mt = AchieveREResponder.createMessageTemplate(FIPANames.InteractionProtocol.FIPA_PROPOSE);
-        //mt = MessageTemplate.and(mt, aux);
         this.addBehaviour(new AchieveREResponder(this, mt) {
             protected ACLMessage prepareResultNotification(ACLMessage propose, ACLMessage response) {
                 return null;
             }
 
             protected ACLMessage handleRequest(ACLMessage propose) {
-                //System.out.println(myAgent.getLocalName() + ": countdown = " + propose.getContent());
                 int countdown = Integer.parseInt(propose.getContent());
                 //System.out.println("Agent '" + getLocalName() + "' recibió countdown del cloud... va a invocar a waker");
                 SemaforoWakerBehaviour b = new SemaforoWakerBehaviour(myAgent, countdown*1000, true);
@@ -349,16 +317,14 @@ public class SemaforoAgent extends Agent {
                 int miTiempo = getTiempoEspera();
                 requestCloud.setContent(String.valueOf(miTiempo));
                 //System.out.println("Agent " + myAgent.getLocalName() + "va a llamar a Cloud con tiempo: " + miTiempo);
-                //System.out.println("Agent '" + getLocalName() + "' proposes  '" + miTiempo + "' [SENDER]");
 
                 // Pregunta al cloud para que negocie con los otros semaforos
                 myAgent.addBehaviour(new AchieveREInitiator(myAgent, requestCloud) {
                     protected void handleInform(ACLMessage inform) {
                         //System.out.println(myAgent.getLocalName() + ": recibido => " + inform.getContent());
-
                     }
                 });
-                // Espera a que el cloud le responda
+                // Ahora esperará a que el cloud le responda
                 ACLMessage informDone  = request.createReply();
                 informDone.setPerformative(ACLMessage.INFORM);
                 return informDone;

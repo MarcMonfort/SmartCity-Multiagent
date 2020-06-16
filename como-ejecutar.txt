@@ -1,0 +1,11 @@
+Para ejecutar la práctia solo hace falta:
+
+(entrar en la carpeta SmartCity, esta carpeta contiene los codigos y el Makefile)
+
+$ make
+$ make gui
+$ make entorno
+
+o ejecutar el entorno desde el gui de JADE.
+El entorno ya se encargara de ejecutar los otros agentes.
+Tambien debeir funcionar desde el IntelliJ

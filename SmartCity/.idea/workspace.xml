@@ -2,13 +2,44 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6baaf3ca-8d46-4e6c-b04e-8e09681f6ecd" name="Default Changelist" comment="basic changes">
-      <change afterPath="$PROJECT_DIR$/.idea/libraries/JenaLibs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/runEntorno.bat" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/APDescription.txt" beforeDir="false" afterPath="$PROJECT_DIR$/APDescription.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/JadeApplication.iml" beforeDir="false" afterPath="$PROJECT_DIR$/SmartCity.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/MTPs-Main-Container.txt" beforeDir="false" afterPath="$PROJECT_DIR$/MTPs-Main-Container.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Makefile" beforeDir="false" afterPath="$PROJECT_DIR$/Makefile" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/SmartCars.owl" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/index-1.html" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/make.bat" beforeDir="false" afterPath="$PROJECT_DIR$/make.bat" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/nbproject/build-impl.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nbproject/configs/GUI.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nbproject/configs/HelloWorld.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nbproject/genfiles.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nbproject/private/config.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nbproject/private/configs/GUI.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nbproject/private/configs/HelloWorld.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nbproject/private/private.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nbproject/private/private.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nbproject/project.properties" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/nbproject/project.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/runHelloWorld.bat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/AIAExamples/communication/Lover.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Behaviours/CloudAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Agentes/CloudAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Behaviours/CyclicBehaviourAgent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Behaviours/EntornoAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Agentes/EntornoAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Behaviours/HelloWorldAgent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Behaviours/OneShotBehaviourAgent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Behaviours/OntologyParser.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Agentes/OntologyParser.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Behaviours/SemaforoAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Agentes/SemaforoAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Behaviours/TermometroAgent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Behaviours/TermostatoAgent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Behaviours/TickerBehaviourAgent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Behaviours/VehiculoAgent.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/Agentes/VehiculoAgent.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Behaviours/WakerBehaviourAgent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Protocols/ContractNetInitiatorAgent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/Protocols/ContractNetResponderAgent.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/org/upc/edu/jenatest/JenaTester.java" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -32,11 +63,12 @@
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="aspect.path.notification.shown" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$/../github/GRAU-SID" />
-    <property name="project.structure.last.edited" value="Modules" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/lib/JenaLibs" />
+    <property name="project.structure.last.edited" value="Libraries" />
     <property name="project.structure.proportion" value="0.15" />
     <property name="project.structure.side.proportion" value="0.2" />
-    <property name="settings.editor.selected.configurable" value="vcs.Git" />
+    <property name="restartRequiresConfirmation" value="false" />
+    <property name="settings.editor.selected.configurable" value="reference.settingsdialog.IDE.editor.colors.Color Scheme Font" />
   </component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
@@ -60,10 +92,10 @@
     </option>
   </component>
   <component name="RunManager" selected="Application.GUI">
-    <configuration name="CyclicBehaviourAgent" type="Application" factoryName="Application">
+    <configuration name="Entorno" type="Application" factoryName="Application">
       <option name="MAIN_CLASS_NAME" value="jade.Boot" />
       <module name="SmartCity" />
-      <option name="PROGRAM_PARAMETERS" value="-local-host 127.0.0.1 -container CycleHello:org.upc.edu.Behaviours.CyclicBehaviourAgent()" />
+      <option name="PROGRAM_PARAMETERS" value="-local-host 127.0.0.1 -container entorno:Agentes.EntornoAgent()" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -78,65 +110,10 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="HelloWorldAgent" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="jade.Boot" />
-      <module name="SmartCity" />
-      <option name="PROGRAM_PARAMETERS" value="-local-host 127.0.0.1 -container HelloTio:org.upc.edu.Behaviours.HelloWorldAgent(&quot;Que&quot;,&quot;pasa&quot;,&quot;tio&quot;)" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="jenatest.Main" />
-      <module name="SmartCity" />
-      <extension name="coverage">
-        <pattern>
-          <option name="PATTERN" value="jenatest.*" />
-          <option name="ENABLED" value="true" />
-        </pattern>
-      </extension>
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TermometroAgent" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="jade.Boot" />
-      <module name="SmartCity" />
-      <option name="PROGRAM_PARAMETERS" value="-local-host 127.0.0.1 -container Termometro:org.upc.edu.Behaviours.TermometroAgent()" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TermostatoAgent" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="jade.Boot" />
-      <module name="SmartCity" />
-      <option name="PROGRAM_PARAMETERS" value="-local-host 127.0.0.1 -container Termostato:org.upc.edu.Behaviours.TermostatoAgent()" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="TickerBehaviourAgent" type="Application" factoryName="Application">
-      <option name="MAIN_CLASS_NAME" value="jade.Boot" />
-      <module name="SmartCity" />
-      <option name="PROGRAM_PARAMETERS" value="-local-host 127.0.0.1 -container TicketAgent:org.upc.edu.Behaviours.TickerBehaviourAgent()" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
     <list>
       <item itemvalue="Application.GUI" />
-      <item itemvalue="Application.HelloWorldAgent" />
-      <item itemvalue="Application.TermostatoAgent" />
-      <item itemvalue="Application.TermometroAgent" />
-      <item itemvalue="Application.TickerBehaviourAgent" />
-      <item itemvalue="Application.CyclicBehaviourAgent" />
-      <item itemvalue="Application.Main" />
+      <item itemvalue="Application.Entorno" />
     </list>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Application.Main" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SvnConfiguration">
     <configuration />

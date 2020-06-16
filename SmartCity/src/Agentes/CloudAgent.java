@@ -3,11 +3,10 @@
  * and open the template in the editor.
  */
 
-package org.upc.edu.Behaviours;
+package Agentes;
 
 import jade.core.AID;
 import jade.core.Agent;
-import jade.core.behaviours.TickerBehaviour;
 import jade.domain.DFService;
 import jade.domain.FIPAAgentManagement.DFAgentDescription;
 import jade.domain.FIPAAgentManagement.ServiceDescription;
@@ -18,18 +17,14 @@ import jade.lang.acl.MessageTemplate;
 import jade.proto.AchieveREInitiator;
 import jade.proto.AchieveREResponder;
 import jade.proto.ContractNetInitiator;
-import org.apache.jena.base.Sys;
 
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Vector;
 
-//import static jade.lang.acl.MessageTemplate.MatchPerformative;
 
-/**
- * @author igomez
- */
+
 public class CloudAgent extends Agent {
 
     private HashMap<String, EntornoAgent.Semaforo> semaforos;
@@ -37,7 +32,6 @@ public class CloudAgent extends Agent {
     boolean respuestaPendiente;
     boolean negociacionEnCurso = false;
     int minTiempoRequested;
-    //EntornoAgent.Calle[] calles;
 
     private class ContractNetInitiatorBehaviour extends ContractNetInitiator {
         public ContractNetInitiatorBehaviour(Agent a, ACLMessage mt) {
@@ -48,40 +42,22 @@ public class CloudAgent extends Agent {
             //System.out.println("[Cloud] Agent '" + propose.getSender().getLocalName() + "' proposed '" + propose.getContent() + "'");
         }
 
-        /*protected void handleRefuse(ACLMessage refuse) {
-            System.out.println("Agent '" + refuse.getSender().getName() + "' refused");
-        }*/
-
-        /*protected void handleFailure(ACLMessage failure) {
-            if (failure.getSender().equals(myAgent.getAMS())) {
-                // FAILURE notification from the JADE runtime: the receiver
-                // does not exist
-                System.out.println("Responder does not exist");
-            } else {
-                System.out.println("Agent '" + failure.getSender().getName() + "' failed");
-            }
-            // Immediate failure --> we will not receive a response from this agent
-            nResponders--;
-        }*/
 
         protected void handleAllResponses(Vector responses, Vector acceptances) {
             int nResponders = semaforos.size() - 1;
             int maxTime = minTiempoRequested;
-            AID bestProposer = null;
 
             if (responses.size() < nResponders) {
                 // Some responder didn't reply within the specified timeout
                 System.out.println("Timeout expired: missing " + (nResponders - responses.size()) + " responses");
             }
             // Evaluate proposals.
-            ACLMessage accept = null;
             Enumeration e = responses.elements();
             while (e.hasMoreElements()) {
                 ACLMessage msg = (ACLMessage) e.nextElement();
                 int proposal = Integer.parseInt(msg.getContent());
                 if (proposal > maxTime) {
                     maxTime = proposal;
-                    bestProposer = msg.getSender();
                 }
 
             }
@@ -109,11 +85,10 @@ public class CloudAgent extends Agent {
                 proposeCloud.addReceiver(semaforoSender);
                 proposeCloud.setSender(myAgent.getAID());
                 proposeCloud.setContent(inform.getContent());
-                //System.out.println("[Cloud] responde al semaforoSender (" + semaforoSender.getLocalName() + ") con el tiempo de espera");
 
                 myAgent.addBehaviour(new AchieveREInitiator(myAgent, proposeCloud) {
                     protected void handleAgree(ACLMessage agree) {
-                        //System.out.println("[Cloud] Ya le ha llegado la respuesta al " + agree.getSender().getLocalName() + " !!!!");
+                        //System.out.println("[Cloud] Ya le ha llegado la respuesta al " + agree.getSender().getLocalName());
                     }
                 });
                 
@@ -175,29 +150,20 @@ public class CloudAgent extends Agent {
                             msg.addReceiver(new AID(s.nombre, AID.ISLOCALNAME));
                         }
                     }
-                    //msg.removeReceiver(semaforoSender); //se envia a todos menos al sender
 
                     msg.setProtocol(FIPANames.InteractionProtocol.FIPA_CONTRACT_NET);
-                    // We want to receive a reply in 10 secs
-                    // HACER CON MENOS TIEMPO
+                    // We want to receive a reply in 1 sec
                     msg.setReplyByDate(new Date(System.currentTimeMillis() + 1000));
 
 
                     respuestaPendiente = true;
-                    //System.out.println("Cloud empieza ContractNetInitiator!!!");
                     informDone.setContent("SI");
-                    //System.out.println("negociacion en curso => " + request.getSender());
                     ContractNetInitiatorBehaviour cib = new ContractNetInitiatorBehaviour(myAgent, msg);
                     addBehaviour(cib);
                 }
                 else informDone.setContent("NO");
-                //MessageTemplate mt = MessageTemplate.MatchPerformative(ACLMessage.INFORM);
-                //ACLMessage resultado = myAgent.blockingReceive(mt);
-                //while(!cib.done());
 
-                // Responde al semaforo inicial con el resultado de contract-net
                 informDone.setPerformative(ACLMessage.INFORM);
-
 
                 return informDone;
             }
